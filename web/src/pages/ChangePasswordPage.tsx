@@ -70,7 +70,7 @@ export function ChangePasswordPage() {
                     <div className="mx-auto w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
                         <Lock className="w-6 h-6 text-amber-600" />
                     </div>
-                    <CardTitle className="text-xl font-bold text-slate-900">Sécurité du compte</CardTitle>
+                    <CardTitle className="text-xl font-bold text-slate-600">Sécurité du compte</CardTitle>
                     <p className="text-sm text-slate-500 mt-2">
                         Pour votre première connexion, vous devez définir un nouveau mot de passe personnel.
                     </p>
@@ -106,7 +106,7 @@ export function ChangePasswordPage() {
                             />
                         </div>
 
-                        <Button type="submit" className="w-full bg-slate-900 hover:bg-slate-800" disabled={isLoading}>
+                        <Button type="submit" className="w-full bg-slate-600 hover:bg-slate-800" disabled={isLoading}>
                             {isLoading ? 'Mise à jour...' : 'Définir mon mot de passe'}
                         </Button>
                     </form>

@@ -29,7 +29,7 @@ export function ProjectDocuments({ projectId }: ProjectDocumentsProps) {
     const getIcon = (filename: string) => {
         const ext = filename.split('.').pop()?.toLowerCase();
         if (['jpg', 'jpeg', 'png', 'gif'].includes(ext || '')) return <FileImage className="w-8 h-8 text-blue-600" />;
-        if (['xls', 'xlsx', 'csv'].includes(ext || '')) return <FileSpreadsheet className="w-8 h-8 text-emerald-600" />;
+        if (['xls', 'xlsx', 'csv'].includes(ext || '')) return <FileSpreadsheet className="w-8 h-8 text-red-600" />;
         return <FileText className="w-8 h-8 text-red-500" />;
     };
 
@@ -42,12 +42,12 @@ export function ProjectDocuments({ projectId }: ProjectDocumentsProps) {
         window.open(fullUrl, '_blank');
     };
 
-    if (isLoading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin text-emerald-600" /></div>;
+    if (isLoading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin text-red-600" /></div>;
 
     return (
         <Card className="h-full flex flex-col">
             <div className="p-6 border-b border-slate-100 flex justify-between items-center">
-                <h3 className="font-semibold text-slate-900">Documents du Projet</h3>
+                <h3 className="font-semibold text-slate-600">Documents du Projet</h3>
                 <Button variant="ghost" size="sm" onClick={fetchDocuments}>
                     Actualiser
                 </Button>
@@ -67,7 +67,7 @@ export function ProjectDocuments({ projectId }: ProjectDocumentsProps) {
                                         {getIcon(doc.name)}
                                     </div>
                                     <div className="min-w-0">
-                                        <p className="font-medium text-slate-900 truncate text-sm">{doc.name}</p>
+                                        <p className="font-medium text-slate-600 truncate text-sm">{doc.name}</p>
                                         <div className="flex items-center gap-2 text-xs text-slate-500">
                                             <span className="bg-slate-200 px-1.5 rounded">{doc.category || 'Autre'}</span>
                                             <span>{new Date(doc.uploadDate).toLocaleDateString()}</span>

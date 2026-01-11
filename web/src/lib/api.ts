@@ -37,6 +37,15 @@ export const api = {
         if (!res.ok) throw new Error('Falied to create client');
         return res.json();
     },
+    createAdmin: async (data: any) => {
+        const res = await fetch(`${API_URL}/auth/register`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ ...data, role: 'admin' }),
+        });
+        if (!res.ok) throw new Error('Failed to create admin');
+        return res.json();
+    },
     getUsers: async (role?: string) => {
         const query = role ? `?role=${role}` : '';
         const res = await fetch(`${API_URL}/users${query}`, { headers: getHeaders() });
@@ -47,11 +56,27 @@ export const api = {
         // Reuse getUsers
         return api.getUsers('client');
     },
+    deleteClient: async (id: number) => {
+        const res = await fetch(`${API_URL}/users/${id}`, {
+            method: 'DELETE',
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error('Failed to delete client');
+        return res.json();
+    },
 
     // Projects
     getProjects: async () => {
         const res = await fetch(`${API_URL}/projects`, { headers: getHeaders() });
         if (!res.ok) throw new Error('Failed to fetch projects');
+        return res.json();
+    },
+    deleteProject: async (id: number) => {
+        const res = await fetch(`${API_URL}/projects/${id}`, {
+            method: 'DELETE',
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error('Failed to delete project');
         return res.json();
     },
     getProject: async (id: string) => {

@@ -77,9 +77,9 @@ export function FinancePage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Suivi Financier</h1>
+                    <h1 className="text-3xl font-bold text-slate-600 tracking-tight">Suivi Financier</h1>
                     <p className="text-slate-500 mt-1">
-                        Vue détaillée pour le projet <span className="font-semibold text-slate-900">{project.name}</span>.
+                        Vue détaillée pour le projet <span className="font-semibold text-slate-600">{project.name}</span>.
                     </p>
                 </div>
                 {projects.length > 1 && (
@@ -111,11 +111,11 @@ export function FinancePage() {
                     <Card className="overflow-hidden border-slate-200 shadow-sm">
                         <CardHeader className="border-b border-slate-100 bg-slate-50/50 py-4">
                             <div className="flex items-center justify-between">
-                                <CardTitle className="text-base font-semibold text-slate-900 flex items-center gap-2">
+                                <CardTitle className="text-base font-semibold text-slate-600 flex items-center gap-2">
                                     <FileText className="w-4 h-4 text-slate-500" />
                                     Historique des transactions ({transactions.length})
                                 </CardTitle>
-                                <Button variant="ghost" size="sm" className="gap-2 text-slate-600 hover:text-slate-900">
+                                <Button variant="ghost" size="sm" className="gap-2 text-slate-600 hover:text-slate-600">
                                     <Download className="w-4 h-4" /> Exporter
                                 </Button>
                             </div>
@@ -127,20 +127,20 @@ export function FinancePage() {
                                 transactions.map((tx: any) => (
                                     <div key={tx.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors group">
                                         <div className="flex items-center gap-4">
-                                            <div className={`p-2.5 rounded-full shrink-0 ${tx.type === 'Payment' ? 'bg-emerald-100 text-emerald-600' : 'bg-blue-50 text-blue-600'}`}>
+                                            <div className={`p-2.5 rounded-full shrink-0 ${tx.type === 'Payment' ? 'bg-red-100 text-red-600' : 'bg-blue-50 text-blue-600'}`}>
                                                 {tx.type === 'Payment' ? <ArrowUpRight className="w-5 h-5" /> : <ArrowDownLeft className="w-5 h-5" />}
                                             </div>
                                             <div>
-                                                <p className="font-medium text-slate-900">{tx.description || 'Transaction sans libellé'}</p>
+                                                <p className="font-medium text-slate-600">{tx.description || 'Transaction sans libellé'}</p>
                                                 <p className="text-xs text-slate-500 mt-0.5">
                                                     {new Date(tx.date).toLocaleDateString()}
                                                     {tx.status === 'Pending' && <span className="ml-2 text-amber-600 font-medium">En attente</span>}
-                                                    {tx.status === 'Completed' && tx.type === 'Invoice' && <span className="ml-2 text-emerald-600 font-medium">Payé</span>}
+                                                    {tx.status === 'Completed' && tx.type === 'Invoice' && <span className="ml-2 text-red-600 font-medium">Payé</span>}
                                                 </p>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className={`font-bold text-sm ${tx.type === 'Payment' ? 'text-emerald-600' : 'text-slate-900'}`}>
+                                            <p className={`font-bold text-sm ${tx.type === 'Payment' ? 'text-red-600' : 'text-slate-600'}`}>
                                                 {tx.type === 'Payment' ? '-' : '+'} {parseFloat(tx.amount).toLocaleString()} €
                                             </p>
                                         </div>
@@ -153,9 +153,9 @@ export function FinancePage() {
 
                 {/* Sidebar Info */}
                 <div className="space-y-6">
-                    <Card className="bg-slate-900 text-white border-none p-6 shadow-xl">
+                    <Card className="bg-slate-600 text-white border-none p-6 shadow-xl">
                         <h3 className="font-semibold mb-6 flex items-center gap-2">
-                            <div className="w-1 h-4 bg-emerald-500 rounded-full" />
+                            <div className="w-1 h-4 bg-red-500 rounded-full" />
                             Coordonnées Bancaires
                         </h3>
                         <div className="space-y-5 text-sm text-slate-300">

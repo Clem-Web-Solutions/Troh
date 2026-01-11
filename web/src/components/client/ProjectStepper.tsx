@@ -20,7 +20,7 @@ export function ProjectStepper({ phases }: ProjectStepperProps) {
     return (
         <Card className="border-none shadow-sm ring-1 ring-slate-200 bg-white">
             <CardHeader className="border-b border-slate-100 py-4">
-                <CardTitle className="text-lg font-bold text-slate-900">Progression du Projet</CardTitle>
+                <CardTitle className="text-lg font-bold text-slate-600">Progression du Projet</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
                 <div className="overflow-x-auto pb-4 pt-8 px-8">
@@ -39,8 +39,8 @@ export function ProjectStepper({ phases }: ProjectStepperProps) {
                                         <div className="flex flex-col items-center relative z-10">
                                             <div className={cn(
                                                 "flex h-12 w-12 items-center justify-center rounded-full border-[3px] transition-all duration-300 bg-white",
-                                                status === 'completed' && "border-emerald-500 text-emerald-500",
-                                                status === 'current' && "border-emerald-500 text-emerald-600 shadow-md scale-110",
+                                                status === 'completed' && "border-red-500 text-red-500",
+                                                status === 'current' && "border-red-500 text-red-600 shadow-md scale-110",
                                                 status === 'upcoming' && "border-slate-200 text-slate-300"
                                             )}>
                                                 {status === 'completed' && <Check className="h-5 w-5 stroke-[3]" />}
@@ -55,7 +55,7 @@ export function ProjectStepper({ phases }: ProjectStepperProps) {
                                                 <div
                                                     className={cn(
                                                         "h-full rounded-full transition-all duration-700",
-                                                        (index < activeIndex || status === 'completed') ? "bg-emerald-500" : "w-0"
+                                                        (index < activeIndex || status === 'completed') ? "bg-red-500" : "w-0"
                                                     )}
                                                 />
                                             </div>
@@ -76,12 +76,12 @@ export function ProjectStepper({ phases }: ProjectStepperProps) {
                                         <div className="w-32 -ml-10 flex flex-col items-center">
                                             <p className={cn(
                                                 "text-sm font-semibold transition-colors duration-300 px-1",
-                                                status === 'upcoming' ? "text-slate-400" : "text-slate-900"
+                                                status === 'upcoming' ? "text-slate-400" : "text-slate-600"
                                             )}>
                                                 {phase.name}
                                             </p>
                                             {status === 'current' && (
-                                                <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full mt-1">
+                                                <span className="text-[10px] font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full mt-1">
                                                     En cours
                                                 </span>
                                             )}

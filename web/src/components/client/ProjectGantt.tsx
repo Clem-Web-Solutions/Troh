@@ -44,7 +44,7 @@ export function ProjectGantt({ phases }: ProjectGanttProps) {
     return (
         <Card className="border-none shadow-sm ring-1 ring-slate-200 bg-white overflow-hidden">
             <CardHeader className="border-b border-slate-100 py-4">
-                <CardTitle className="text-lg font-bold text-slate-900">Planning du Projet</CardTitle>
+                <CardTitle className="text-lg font-bold text-slate-600">Planning du Projet</CardTitle>
             </CardHeader>
             <CardContent className="p-6 overflow-x-auto">
                 <div className="min-w-[700px] relative space-y-6">
@@ -81,7 +81,7 @@ export function ProjectGantt({ phases }: ProjectGanttProps) {
                                         {/* Bar */}
                                         <div
                                             className={`absolute h-6 rounded-md shadow-sm transition-all duration-300 flex items-center px-2 text-xs font-semibold text-white whitespace-nowrap overflow-hidden
-                                                ${isCompleted ? 'bg-emerald-500' : 'bg-blue-500 opacity-80'}
+                                                ${isCompleted ? 'bg-red-500' : 'bg-blue-500 opacity-80'}
                                             `}
                                             style={{ left: `${start}%`, width: `${width}%` }}
                                         >

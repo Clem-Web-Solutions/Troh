@@ -99,4 +99,24 @@ exports.updateProject = async (req, res) => {
         console.error(error);
         res.status(500).json({ message: 'Erreur lors de la mise à jour' });
     }
-}
+};
+
+exports.deleteProject = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const project = await Project.findByPk(id);
+
+        if (!project) return res.status(404).json({ message: 'Projet introuvable' });
+
+        // Security: only admin can delete
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Accès refusé' });
+        }
+
+        await project.destroy();
+        res.json({ message: 'Projet supprimé avec succès' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erreur lors de la suppression' });
+    }
+};

@@ -30,7 +30,7 @@ export function DocumentsPage() {
     const getIcon = (filename: string) => {
         const ext = filename.split('.').pop()?.toLowerCase();
         if (['jpg', 'jpeg', 'png', 'gif'].includes(ext || '')) return <FileImage className="w-8 h-8 text-blue-600" />;
-        if (['xls', 'xlsx', 'csv'].includes(ext || '')) return <FileSpreadsheet className="w-8 h-8 text-emerald-600" />;
+        if (['xls', 'xlsx', 'csv'].includes(ext || '')) return <FileSpreadsheet className="w-8 h-8 text-red-600" />;
         return <FileText className="w-8 h-8 text-red-500" />;
     };
 
@@ -51,7 +51,7 @@ export function DocumentsPage() {
 
             {/* Header */}
             <div>
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Mes Documents</h1>
+                <h1 className="text-3xl font-bold text-slate-600 tracking-tight">Mes Documents</h1>
                 <p className="text-slate-500 mt-1">Retrouvez tous les fichiers relatifs à votre projet.</p>
             </div>
 
@@ -65,7 +65,7 @@ export function DocumentsPage() {
                             placeholder="Rechercher un document..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                            className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500"
                         />
                     </div>
                     <div className="flex gap-2 w-full sm:w-auto">
@@ -75,7 +75,7 @@ export function DocumentsPage() {
                                     key={cat}
                                     onClick={() => setFilterCategory(filterCategory === cat ? null : cat)}
                                     className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${filterCategory === cat
-                                            ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                                            ? 'bg-red-50 border-red-200 text-red-700'
                                             : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                                         }`}
                                 >
@@ -95,7 +95,7 @@ export function DocumentsPage() {
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {filteredDocuments.map((doc) => (
-                        <Card key={doc.id} className="group p-4 flex flex-col gap-4 hover:shadow-md transition-all duration-300 border-slate-200/60 hover:border-emerald-500/30">
+                        <Card key={doc.id} className="group p-4 flex flex-col gap-4 hover:shadow-md transition-all duration-300 border-slate-200/60 hover:border-red-500/30">
                             <div className="flex items-start justify-between">
                                 <div className="p-2.5 bg-slate-50 rounded-xl group-hover:bg-white border border-slate-100 group-hover:scale-110 transition-transform duration-300">
                                     {getIcon(doc.name)}
@@ -111,7 +111,7 @@ export function DocumentsPage() {
                             </div>
 
                             <div className="space-y-1">
-                                <p className="font-medium text-slate-900 truncate" title={doc.name}>{doc.name}</p>
+                                <p className="font-medium text-slate-600 truncate" title={doc.name}>{doc.name}</p>
                                 <div className="flex items-center justify-between text-xs text-slate-500">
                                     <span>{new Date(doc.uploadDate).toLocaleDateString()}</span>
                                     <span className="bg-slate-100 px-2 py-0.5 rounded-full">{doc.category}</span>

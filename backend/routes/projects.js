@@ -7,5 +7,6 @@ router.get('/', authMiddleware, projectController.getAllProjects);
 router.get('/:id', authMiddleware, projectController.getProjectById);
 router.post('/', authMiddleware, checkRole(['admin']), projectController.createProject);
 router.patch('/:id', authMiddleware, checkRole(['admin']), projectController.updateProject);
+router.delete('/:id', authMiddleware, checkRole(['admin']), projectController.deleteProject);
 
 module.exports = router;

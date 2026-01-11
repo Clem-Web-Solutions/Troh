@@ -3,36 +3,41 @@ import { Save, Bell, Lock, Globe } from 'lucide-react';
 
 import { useState } from 'react';
 
+import { InviteAdminModal } from '../components/admin/InviteAdminModal';
+
 export function AdminSettingsPage() {
     const [activeTab, setActiveTab] = useState<'notifications' | 'security' | 'company'>('notifications');
+    const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <InviteAdminModal isOpen={isInviteModalOpen} onClose={() => setIsInviteModalOpen(false)} />
 
             {/* Header */}
             <div>
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Paramètres</h1>
-                <p className="text-slate-500 mt-1">Configuration générale de la plateforme.</p>
+                <h1 className="text-3xl font-bold text-slate-600 tracking-tight">Paramètres</h1>
+                <p className="text-slate-500 mt-1">Configuration de l'application Meereo Project.</p>
             </div>
 
             <div className="border-b border-slate-200">
                 <div className="flex items-center gap-8">
                     <button
                         onClick={() => setActiveTab('notifications')}
-                        className={`pb-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'notifications' ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+                        className={`pb-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'notifications' ? 'border-red-500 text-red-600' : 'border-transparent text-slate-500 hover:text-slate-700'
                             }`}
                     >
                         Notifications
                     </button>
                     <button
                         onClick={() => setActiveTab('security')}
-                        className={`pb-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'security' ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+                        className={`pb-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'security' ? 'border-red-500 text-red-600' : 'border-transparent text-slate-500 hover:text-slate-700'
                             }`}
                     >
                         Sécurité & Équipe
                     </button>
                     <button
                         onClick={() => setActiveTab('company')}
-                        className={`pb-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'company' ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+                        className={`pb-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'company' ? 'border-red-500 text-red-600' : 'border-transparent text-slate-500 hover:text-slate-700'
                             }`}
                     >
                         Informations Entreprise
@@ -56,7 +61,7 @@ export function AdminSettingsPage() {
                             {['Confirmation de paiement', 'Passage de phase', 'Nouveau document disponible', 'Message reçu'].map((item) => (
                                 <div key={item} className="flex items-center justify-between">
                                     <span className="text-sm font-medium text-slate-700">{item}</span>
-                                    <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-emerald-500 cursor-pointer">
+                                    <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-red-500 cursor-pointer">
                                         <span className="translate-x-6 inline-block h-4 w-4 transform rounded-full bg-white transition" />
                                     </div>
                                 </div>
@@ -78,18 +83,22 @@ export function AdminSettingsPage() {
                         </CardHeader>
                         <CardContent className="p-6 space-y-6">
                             <div className="space-y-4">
-                                <h3 className="text-sm font-medium text-slate-900">Administrateurs Actifs</h3>
+                                <h3 className="text-sm font-medium text-slate-600">Administrateurs Actifs</h3>
                                 <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                                     <div className="flex items-center gap-3">
                                         <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600">A</div>
                                         <div>
-                                            <p className="text-sm font-medium text-slate-900">Admin Principal</p>
+                                            <p className="text-sm font-medium text-slate-600">Admin Principal</p>
                                             <p className="text-xs text-slate-500">admin@meereo.com</p>
                                         </div>
                                     </div>
-                                    <span className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded">Moi</span>
+                                    <span className="text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded">Moi</span>
                                 </div>
-                                <Button variant="ghost" className="w-full border border-dashed border-slate-300 text-slate-500 hover:text-slate-900 hover:border-slate-900">
+                                <Button
+                                    variant="ghost"
+                                    className="w-full border border-dashed border-slate-300 text-slate-500 hover:text-slate-600 hover:border-slate-600"
+                                    onClick={() => setIsInviteModalOpen(true)}
+                                >
                                     + Inviter un nouvel administrateur
                                 </Button>
                             </div>
@@ -131,7 +140,7 @@ export function AdminSettingsPage() {
                                 </div>
                             </div>
                             <div className="flex justify-end pt-2">
-                                <Button className="gap-2 bg-slate-900 text-white">
+                                <Button className="gap-2 bg-slate-600 text-white">
                                     <Save className="w-4 h-4" /> Enregistrer
                                 </Button>
                             </div>

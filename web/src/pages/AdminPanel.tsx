@@ -47,16 +47,28 @@ export function AdminPanel({ onNavigateToProject }: AdminPanelProps) {
         }
     };
 
+    const handleDeleteProject = async (projectId: number) => {
+        if (window.confirm('Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible.')) {
+            try {
+                await api.deleteProject(projectId);
+                fetchProjects();
+            } catch (err: any) {
+                console.error(err);
+                alert('Erreur lors de la suppression du projet.');
+            }
+        }
+    };
+
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
 
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Projets</h1>
+                    <h1 className="text-3xl font-bold text-slate-600 tracking-tight">Projets</h1>
                     <p className="text-slate-500 mt-1">Gérez l'ensemble de vos projets immobiliers.</p>
                 </div>
-                <Button onClick={() => setIsCreateModalOpen(true)} className="gap-2 bg-emerald-600 hover:bg-emerald-700">
+                <Button onClick={() => setIsCreateModalOpen(true)} className="gap-2 bg-red-600 hover:bg-red-700">
                     <Plus className="w-4 h-4" /> Nouveau Projet
                 </Button>
             </div>
@@ -64,11 +76,11 @@ export function AdminPanel({ onNavigateToProject }: AdminPanelProps) {
             {/* Projects Table */}
             <div className="space-y-4">
                 {isLoading ? (
-                    <div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-emerald-600" /></div>
+                    <div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin text-red-600" /></div>
                 ) : error ? (
                     <div className="text-red-500">Erreur : {error}</div>
                 ) : (
-                    <ProjectTable projects={projects} onSelectProject={onNavigateToProject} />
+                    <ProjectTable projects={projects} onSelectProject={onNavigateToProject} onDelete={handleDeleteProject} />
                 )}
             </div>
 

@@ -8,14 +8,16 @@ export function AdminDashboard() {
     const [stats, setStats] = useState<any[]>([]);
     const [activities, setActivities] = useState<any[]>([]);
     const [projectCount, setProjectCount] = useState<string>('-');
+    const [clientCount, setClientCount] = useState<string>('-');
 
     useEffect(() => {
         const loadDashboardData = async () => {
             try {
-                const [recentActivities, activityStats, projects] = await Promise.all([
+                const [recentActivities, activityStats, projects, clients] = await Promise.all([
                     api.getRecentActivities(),
                     api.getActivityStats(),
-                    api.getProjects()
+                    api.getProjects(),
+                    api.getClients()
                 ]);
 
                 setActivities(recentActivities);
@@ -24,6 +26,7 @@ export function AdminDashboard() {
                     count: s.count
                 })));
                 setProjectCount(projects.length.toString());
+                setClientCount(clients.length.toString());
 
             } catch (error) {
                 console.error("Dashboard data load failed", error);
@@ -34,7 +37,7 @@ export function AdminDashboard() {
 
     const getActivityIcon = (type: string) => {
         switch (type) {
-            case 'PROJECT_CREATED': return <Briefcase className="w-4 h-4 text-emerald-600" />;
+            case 'PROJECT_CREATED': return <Briefcase className="w-4 h-4 text-red-600" />;
             case 'PHASE_COMPLETED': return <CheckCircle2 className="w-4 h-4 text-blue-600" />;
             case 'DOCUMENT_UPLOADED': return <FileText className="w-4 h-4 text-orange-600" />;
             default: return <Activity className="w-4 h-4 text-slate-500" />;
@@ -45,7 +48,7 @@ export function AdminDashboard() {
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header */}
             <div>
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Tableau de bord</h1>
+                <h1 className="text-3xl font-bold text-slate-600 tracking-tight">Tableau de bord</h1>
                 <p className="text-slate-500 mt-1">Vue synthétique de l'activité.</p>
             </div>
 
@@ -54,10 +57,10 @@ export function AdminDashboard() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium text-slate-500">Projets Actifs</CardTitle>
-                        <Briefcase className="w-4 h-4 text-emerald-600" />
+                        <Briefcase className="w-4 h-4 text-red-600" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-slate-900">{projectCount}</div>
+                        <div className="text-2xl font-bold text-slate-600">{projectCount}</div>
                         <p className="text-xs text-slate-500 mt-1">Total Projets</p>
                     </CardContent>
                 </Card>
@@ -68,8 +71,8 @@ export function AdminDashboard() {
                         <Users className="w-4 h-4 text-blue-600" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-slate-900">-</div>
-                        <p className="text-xs text-slate-500 mt-1">Données non disponibles</p>
+                        <div className="text-2xl font-bold text-slate-600">{clientCount}</div>
+                        <p className="text-xs text-slate-500 mt-1">Clients inscrits</p>
                     </CardContent>
                 </Card>
                 <Card>
@@ -78,7 +81,7 @@ export function AdminDashboard() {
                         <Activity className="w-4 h-4 text-purple-600" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-slate-900">{activities.length}</div>
+                        <div className="text-2xl font-bold text-slate-600">{activities.length}</div>
                         <p className="text-xs text-slate-500 mt-1">Cette semaine</p>
                     </CardContent>
                 </Card>
@@ -133,7 +136,7 @@ export function AdminDashboard() {
                                             </div>
                                         </div>
                                         <div className="flex-1 space-y-1">
-                                            <p className="text-sm font-medium leading-none text-slate-900">{activity.description}</p>
+                                            <p className="text-sm font-medium leading-none text-slate-600">{activity.description}</p>
                                             <div className="flex items-center gap-2 text-xs text-slate-500">
                                                 <span>{new Date(activity.createdAt).toLocaleTimeString()}</span>
                                                 {activity.project && (

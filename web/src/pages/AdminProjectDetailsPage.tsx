@@ -55,7 +55,7 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
 
             {/* Header */}
             <div className="flex flex-col gap-4 shrink-0">
-                <Button variant="ghost" className="w-fit -ml-2 text-slate-500 hover:text-slate-900" onClick={onBack}>
+                <Button variant="ghost" className="w-fit -ml-2 text-slate-500 hover:text-slate-600" onClick={onBack}>
                     <ArrowLeft className="w-4 h-4 mr-2" /> Retour aux projets
                 </Button>
 
@@ -63,7 +63,7 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 px-1">
                         <div>
                             <div className="flex items-center gap-3 mb-2">
-                                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">{PROJECT.name}</h1>
+                                <h1 className="text-3xl font-bold text-slate-600 tracking-tight">{PROJECT.name}</h1>
                                 <Badge variant="success">En cours</Badge>
                             </div>
                             <div className="flex items-center gap-6 text-slate-500 text-sm">
@@ -81,21 +81,21 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
                     <div className="flex items-center gap-8 px-1">
                         <button
                             onClick={() => setActiveTab('tasks')}
-                            className={`pb-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'tasks' ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+                            className={`pb-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'tasks' ? 'border-red-500 text-red-600' : 'border-transparent text-slate-500 hover:text-slate-700'
                                 }`}
                         >
                             Suivi & Tâches
                         </button>
                         <button
                             onClick={() => setActiveTab('documents')}
-                            className={`pb-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'documents' ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+                            className={`pb-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'documents' ? 'border-red-500 text-red-600' : 'border-transparent text-slate-500 hover:text-slate-700'
                                 }`}
                         >
                             Documents & Upload
                         </button>
                         <button
                             onClick={() => setActiveTab('finance')}
-                            className={`pb-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'finance' ? 'border-emerald-500 text-emerald-600' : 'border-transparent text-slate-500 hover:text-slate-700'
+                            className={`pb-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'finance' ? 'border-red-500 text-red-600' : 'border-transparent text-slate-500 hover:text-slate-700'
                                 }`}
                         >
                             Finance

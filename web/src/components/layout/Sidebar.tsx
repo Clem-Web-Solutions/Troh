@@ -34,7 +34,7 @@ export function Sidebar({ currentPath, onNavigate, isMobileOpen, setIsMobileOpen
             {/* Mobile Overlay */}
             {isMobileOpen && (
                 <div
-                    className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm md:hidden"
+                    className="fixed inset-0 z-40 bg-slate-600/50 backdrop-blur-sm md:hidden"
                     onClick={() => setIsMobileOpen(false)}
                 />
             )}
@@ -48,18 +48,34 @@ export function Sidebar({ currentPath, onNavigate, isMobileOpen, setIsMobileOpen
                 )}
             >
                 {/* Header */}
-                <div className="flex h-16 items-center justify-between px-4 border-b border-slate-100">
-                    <div className={cn("flex items-center gap-2 font-bold text-xl text-slate-900 overflow-hidden", collapsed && "hidden")}>
-                        <span className="text-emerald-600">Meereo</span>
+                <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100 shrink-0 relative">
+                    <div className={cn("flex items-center gap-3", collapsed && "w-full justify-center")}>
+                        <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center text-white font-bold shrink-0 transition-colors">M</div>
+                        {!collapsed && (
+                            <span className="font-bold text-xl text-slate-800 whitespace-nowrap transition-opacity animate-in fade-in duration-300">
+                                Meereo Project
+                            </span>
+                        )}
                     </div>
-                    {collapsed && <span className="w-full text-center font-bold text-emerald-600">M</span>}
 
-                    <button
-                        onClick={() => setCollapsed(!collapsed)}
-                        className="hidden md:flex p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
-                    >
-                        <ChevronLeft className={cn("w-5 h-5 transition-transform", collapsed && "rotate-180")} />
-                    </button>
+                    {!collapsed && (
+                        <button
+                            onClick={() => setCollapsed(!collapsed)}
+                            className="hidden md:flex p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+                        >
+                            <ChevronLeft className="w-5 h-5" />
+                        </button>
+                    )}
+
+                    {/* Collapsed Toggle Overlay */}
+                    {collapsed && (
+                        <button
+                            onClick={() => setCollapsed(!collapsed)}
+                            className="hidden md:flex absolute -right-3 top-6 bg-white border border-slate-200 text-slate-500 rounded-full p-1 shadow-md hover:text-slate-600 transition-all z-50"
+                        >
+                            <ChevronLeft className="w-4 h-4 rotate-180" />
+                        </button>
+                    )}
                 </div>
 
                 {/* Navigation */}
@@ -74,11 +90,11 @@ export function Sidebar({ currentPath, onNavigate, isMobileOpen, setIsMobileOpen
                             className={cn(
                                 "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group",
                                 currentPath === item.path
-                                    ? "bg-slate-900 text-white shadow-md shadow-slate-900/10"
+                                    ? "bg-neutral-600 text-white shadow-md shadow-slate-200"
                                     : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                             )}
                         >
-                            <item.icon className={cn("w-5 h-5 shrink-0", currentPath === item.path ? "text-emerald-400" : "text-slate-400 group-hover:text-slate-600")} />
+                            <item.icon className={cn("w-5 h-5 shrink-0", currentPath === item.path ? "text-white" : "text-slate-400 group-hover:text-slate-600")} />
                             {!collapsed && <span className="font-medium whitespace-nowrap">{item.label}</span>}
                         </button>
                     ))}
@@ -96,7 +112,7 @@ export function Sidebar({ currentPath, onNavigate, isMobileOpen, setIsMobileOpen
                         {!collapsed && <span className="font-medium">Déconnexion</span>}
                     </button>
                 </div>
-            </aside>
+            </aside >
         </>
     );
 }

@@ -20,7 +20,7 @@ const Document = sequelize.define('Document', {
         allowNull: false,
     },
     category: {
-        type: DataTypes.ENUM('Plans', 'Administratif', 'Financier', 'Technique', 'Autre'),
+        type: DataTypes.ENUM('Plans', 'Administratif', 'Financier', 'Technique', 'Photos', 'Autre'),
         defaultValue: 'Autre',
     },
     url: {

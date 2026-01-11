@@ -14,9 +14,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ({ className, variant = 'primary', size = 'md', ...props }, ref) => {
         const variants = {
-            primary: 'bg-slate-900 text-white hover:bg-slate-800',
-            secondary: 'bg-white text-slate-900 border border-slate-200 hover:bg-slate-50',
-            ghost: 'bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+            primary: 'bg-slate-600 text-white hover:bg-slate-800',
+            secondary: 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50',
+            ghost: 'bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-600',
             danger: 'bg-red-500 text-white hover:bg-red-600',
         };
 
@@ -77,10 +77,10 @@ interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 export function Badge({ className, variant = 'default', ...props }: BadgeProps) {
     const variants = {
-        default: 'border-transparent bg-slate-900 text-slate-50',
-        success: 'border-transparent bg-emerald-500 text-white',
+        default: 'border-transparent bg-slate-600 text-slate-50',
+        success: 'border-transparent bg-red-500 text-white',
         warning: 'border-transparent bg-amber-500 text-white',
-        neutral: 'border-transparent bg-slate-100 text-slate-900',
+        neutral: 'border-transparent bg-slate-100 text-slate-600',
     };
 
     return (

@@ -12,21 +12,21 @@ export function FinanceSummary({ totalBudget, paidAmount, totalLabel = "Budget T
     const progress = totalBudget > 0 ? (paidAmount / totalBudget) * 100 : 0;
 
     return (
-        <Card className="bg-slate-900 text-white border-slate-800 shadow-xl overflow-hidden relative">
+        <Card className="bg-slate-600 text-white border-slate-800 shadow-xl overflow-hidden relative">
             {/* Background Decorative Element */}
-            <div className="absolute top-0 right-0 -mt-8 -mr-8 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl" />
+            <div className="absolute top-0 right-0 -mt-8 -mr-8 w-32 h-32 bg-red-500/10 rounded-full blur-2xl" />
             <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl" />
 
             <CardContent className="p-6 relative z-10">
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-slate-800 rounded-lg">
-                            <Euro className="w-5 h-5 text-emerald-400" />
+                            <Euro className="w-5 h-5 text-red-400" />
                         </div>
                         <h3 className="font-semibold text-lg">Situation Financière</h3>
                     </div>
                     {remaining <= 0 && totalBudget > 0 && (
-                        <div className="flex items-center gap-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                        <div className="flex items-center gap-1.5 text-xs font-medium text-red-400 bg-red-500/10 px-2.5 py-1 rounded-full border border-red-500/20">
                             <TrendingUp className="w-3.5 h-3.5" />
                             <span>En règle</span>
                         </div>
@@ -51,7 +51,7 @@ export function FinanceSummary({ totalBudget, paidAmount, totalLabel = "Budget T
                     </div>
                     <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
                         <div
-                            className="h-full bg-emerald-500 rounded-full transition-all duration-1000 ease-out"
+                            className="h-full bg-red-500 rounded-full transition-all duration-1000 ease-out"
                             style={{ width: `${progress}%` }}
                         />
                     </div>

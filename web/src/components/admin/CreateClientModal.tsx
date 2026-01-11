@@ -48,17 +48,17 @@ export function CreateClientModal({ isOpen, onClose, onSubmit }: CreateClientMod
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in"
+                className="absolute inset-0 bg-slate-600/40 backdrop-blur-sm animate-in fade-in"
                 onClick={onClose}
             />
 
             {/* Modal */}
             <div className="relative w-full max-w-xl bg-white rounded-xl shadow-2xl p-6 m-4 animate-in zoom-in-95 duration-200">
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-slate-900">Nouveau Client</h2>
+                    <h2 className="text-xl font-bold text-slate-600">Nouveau Client</h2>
                     <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
                         <X className="w-5 h-5 text-slate-500" />
                     </button>
@@ -68,26 +68,26 @@ export function CreateClientModal({ isOpen, onClose, onSubmit }: CreateClientMod
 
                     {/* Success State - Temp Password */}
                     {tempPassword && (
-                        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-4 animate-in fade-in slide-in-from-top-2">
-                            <div className="flex items-center gap-2 text-emerald-800 font-semibold mb-2">
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 animate-in fade-in slide-in-from-top-2">
+                            <div className="flex items-center gap-2 text-red-800 font-semibold mb-2">
                                 <span className="text-xl">🎉 Client créé avec succès !</span>
                             </div>
-                            <p className="text-sm text-emerald-700 mb-3">
+                            <p className="text-sm text-red-700 mb-3">
                                 Voici le mot de passe provisoire à communiquer au client. Il devra le changer lors de sa première connexion.
                             </p>
-                            <div className="bg-white border border-emerald-200 rounded p-3 flex items-center justify-between">
+                            <div className="bg-white border border-red-200 rounded p-3 flex items-center justify-between">
                                 <code className="text-lg font-mono font-bold text-slate-800 tracking-wider select-all">{tempPassword}</code>
                                 <Button
                                     type="button"
                                     size="sm"
                                     variant="ghost"
                                     onClick={() => navigator.clipboard.writeText(tempPassword)}
-                                    className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
                                 >
                                     Copier
                                 </Button>
                             </div>
-                            <Button type="button" className="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 text-white" onClick={onClose}>
+                            <Button type="button" className="w-full mt-4 bg-red-600 hover:bg-red-700 text-white" onClick={onClose}>
                                 Terminer
                             </Button>
                         </div>
@@ -165,7 +165,7 @@ export function CreateClientModal({ isOpen, onClose, onSubmit }: CreateClientMod
 
                             <div className="flex gap-3 pt-2">
                                 <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>Annuler</Button>
-                                <Button type="submit" className="flex-1 bg-slate-900 hover:bg-slate-800">Ajouter le client</Button>
+                                <Button type="submit" className="flex-1 bg-slate-600 hover:bg-slate-800">Ajouter le client</Button>
                             </div>
                         </>
                     )}

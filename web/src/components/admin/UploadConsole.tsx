@@ -38,7 +38,7 @@ export function UploadConsole({ projectId }: UploadConsoleProps) {
         <Card className="h-full flex flex-col min-h-0 shadow-none border-slate-200">
             <CardHeader className="p-3 pb-2">
                 <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-                    <UploadCloud className="w-4 h-4 text-emerald-600" />
+                    <UploadCloud className="w-4 h-4 text-red-600" />
                     Upload Rapide
                 </CardTitle>
             </CardHeader>
@@ -47,7 +47,7 @@ export function UploadConsole({ projectId }: UploadConsoleProps) {
                 <div
                     className={cn(
                         "flex-1 border border-dashed rounded-lg flex flex-col items-center justify-center p-2 text-center transition-all duration-200 min-h-0",
-                        isDragging ? "border-emerald-500 bg-emerald-50" : "border-slate-300 hover:border-slate-400 hover:bg-slate-50"
+                        isDragging ? "border-red-500 bg-red-50" : "border-slate-300 hover:border-slate-400 hover:bg-slate-50"
                     )}
                     onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                     onDragLeave={() => setIsDragging(false)}
@@ -67,18 +67,18 @@ export function UploadConsole({ projectId }: UploadConsoleProps) {
 
                     {files ? (
                         <div className="flex flex-col items-center gap-1">
-                            <div className="p-1.5 bg-emerald-100 rounded-full text-emerald-600">
+                            <div className="p-1.5 bg-red-100 rounded-full text-red-600">
                                 <UploadCloud className="w-4 h-4" />
                             </div>
-                            <p className="font-medium text-emerald-700 text-xs truncate max-w-[140px]">{files[0].name}</p>
+                            <p className="font-medium text-red-700 text-xs truncate max-w-[140px]">{files[0].name}</p>
                         </div>
                     ) : (
                         <div className="flex flex-col items-center gap-1.5">
-                            <div className="p-1.5 bg-white rounded-full shadow-sm text-emerald-600 border border-slate-100">
+                            <div className="p-1.5 bg-white rounded-full shadow-sm text-red-600 border border-slate-100">
                                 <UploadCloud className="w-4 h-4" />
                             </div>
                             <div>
-                                <p className="font-medium text-slate-900 text-xs">Glisser ou cliquer</p>
+                                <p className="font-medium text-slate-600 text-xs">Glisser ou cliquer</p>
                             </div>
                         </div>
                     )}
@@ -94,7 +94,7 @@ export function UploadConsole({ projectId }: UploadConsoleProps) {
                             className={cn(
                                 "text-[10px] uppercase tracking-wide font-semibold px-2 py-1.5 rounded-md transition-colors text-left border",
                                 category === cat
-                                    ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                                    ? "bg-red-50 border-red-200 text-red-700"
                                     : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:border-slate-300"
                             )}>
                             {cat}
@@ -103,7 +103,7 @@ export function UploadConsole({ projectId }: UploadConsoleProps) {
                 </div>
 
                 {files && (
-                    <Button onClick={handleUpload} disabled={isUploading} className="w-full bg-emerald-600 hover:bg-emerald-700">
+                    <Button onClick={handleUpload} disabled={isUploading} className="w-full bg-red-600 hover:bg-red-700">
                         {isUploading ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : null}
                         Uploader
                     </Button>

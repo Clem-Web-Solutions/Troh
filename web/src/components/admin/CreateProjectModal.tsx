@@ -19,11 +19,18 @@ export function CreateProjectModal({ isOpen, onClose, onSubmit }: CreateProjectM
         projectManagerId: ''
     });
     const [projectManagers, setProjectManagers] = useState<any[]>([]);
+    const [clients, setClients] = useState<any[]>([]);
 
     useEffect(() => {
         if (isOpen) {
-            // Fetch potential Project Managers (Admins)
-            api.getUsers('admin').then(setProjectManagers).catch(console.error);
+            // Fetch potential Project Managers (Admins) and Clients
+            Promise.all([
+                api.getUsers('admin'),
+                api.getClients()
+            ]).then(([admins, clientsData]) => {
+                setProjectManagers(admins);
+                setClients(clientsData);
+            }).catch(console.error);
         }
     }, [isOpen]);
 
@@ -35,17 +42,17 @@ export function CreateProjectModal({ isOpen, onClose, onSubmit }: CreateProjectM
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center">
             {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in"
+                className="absolute inset-0 bg-slate-600/40 backdrop-blur-sm animate-in fade-in"
                 onClick={onClose}
             />
 
             {/* Modal */}
             <div className="relative w-full max-w-xl bg-white rounded-xl shadow-2xl p-6 m-4 animate-in zoom-in-95 duration-200">
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-slate-900">Nouveau Projet</h2>
+                    <h2 className="text-xl font-bold text-slate-600">Nouveau Projet</h2>
                     <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
                         <X className="w-5 h-5 text-slate-500" />
                     </button>
@@ -58,17 +65,20 @@ export function CreateProjectModal({ isOpen, onClose, onSubmit }: CreateProjectM
                         <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider">Informations Client</h3>
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">ID Client (Temporaire)</label>
+                                <label className="text-sm font-medium text-slate-700">Client</label>
                                 <div className="relative">
                                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                    <input
-                                        type="number"
+                                    <select
                                         value={formData.client}
                                         onChange={(e) => setFormData({ ...formData, client: e.target.value })}
-                                        className="w-full pl-9 px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none"
-                                        placeholder="ID Client"
+                                        className="w-full pl-9 px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none appearance-none bg-white"
                                         required
-                                    />
+                                    >
+                                        <option value="">Sélectionner un client...</option>
+                                        {clients.map(client => (
+                                            <option key={client.id} value={client.id}>{client.name} (ID: {client.id})</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
                             <div className="space-y-2">
@@ -78,7 +88,8 @@ export function CreateProjectModal({ isOpen, onClose, onSubmit }: CreateProjectM
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                     className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none"
-                                    placeholder="client@email.com"
+                                    placeholder="Auto-rempli..."
+                                    readOnly={!!formData.client} // Make read-only if client selected, or auto-fill
                                 />
                             </div>
                         </div>
@@ -153,7 +164,7 @@ export function CreateProjectModal({ isOpen, onClose, onSubmit }: CreateProjectM
 
                     <div className="flex gap-3 pt-2">
                         <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>Annuler</Button>
-                        <Button type="submit" className="flex-1 bg-emerald-600 hover:bg-emerald-700">Créer le projet</Button>
+                        <Button type="submit" className="flex-1 bg-red-600 hover:bg-red-700">Créer le projet</Button>
                     </div>
 
                 </form>

@@ -53,10 +53,10 @@ export function ProjectTimeline({ phases }: ProjectTimelineProps) {
             <CardHeader className="border-b border-slate-100 py-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <CardTitle className="text-xl font-bold text-slate-900">Progression du Projet</CardTitle>
+                        <CardTitle className="text-xl font-bold text-slate-600">Progression du Projet</CardTitle>
                         <p className="text-sm text-slate-500 mt-1">Suivez les étapes clés de votre chantier.</p>
                     </div>
-                    <div className="text-sm font-medium text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100 hidden md:block">
+                    <div className="text-sm font-medium text-red-600 bg-red-50 px-3 py-1 rounded-full border border-red-100 hidden md:block">
                         {/* Calculate active phase */}
                         {(() => {
                             const completed = phases.filter(p => p.status.toLowerCase() === 'completed').length;
@@ -82,10 +82,10 @@ export function ProjectTimeline({ phases }: ProjectTimelineProps) {
                                 {/* Connection Line Top (Visual) */}
                                 <div className="flex items-center text-slate-200 mb-4 relative px-2">
                                     <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 z-10 bg-white transition-colors duration-300
-                                        ${isCompleted ? 'border-emerald-500 text-emerald-500' :
+                                        ${isCompleted ? 'border-red-500 text-red-500' :
                                             isNextPending ? 'border-blue-500 text-blue-500 shadow-[0_0_0_4px_rgba(59,130,246,0.1)]' : 'border-slate-200 text-slate-300'}
                                     `}>
-                                        {isCompleted ? <CheckCircle2 className="w-5 h-5 fill-emerald-50" /> :
+                                        {isCompleted ? <CheckCircle2 className="w-5 h-5 fill-red-50" /> :
                                             isNextPending ? <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse" /> :
                                                 <Circle className="w-5 h-5" />}
                                     </div>
@@ -93,7 +93,7 @@ export function ProjectTimeline({ phases }: ProjectTimelineProps) {
                                     {/* Line connecting to next */}
                                     {index < phases.length - 1 && (
                                         <div className={`flex-1 h-0.5 ml-2 rounded-full
-                                            ${isCompleted ? 'bg-emerald-500' : 'bg-slate-200'}
+                                            ${isCompleted ? 'bg-red-500' : 'bg-slate-200'}
                                         `} />
                                     )}
                                 </div>
@@ -113,7 +113,7 @@ export function ProjectTimeline({ phases }: ProjectTimelineProps) {
 
                                     <div>
                                         <div className="flex justify-between items-start mb-2">
-                                            <h3 className={`font-semibold text-base leading-tight ${isNextPending ? 'text-slate-900' : 'text-slate-700'}`}>
+                                            <h3 className={`font-semibold text-base leading-tight ${isNextPending ? 'text-slate-600' : 'text-slate-700'}`}>
                                                 {phase.name}
                                             </h3>
                                             {isNextPending && (

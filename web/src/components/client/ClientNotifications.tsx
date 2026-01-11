@@ -38,7 +38,7 @@ export function ClientNotifications() {
     if (notifications.length === 0) return (
         <Card className="border-none shadow-none bg-transparent">
             <CardHeader className="px-0 pb-2">
-                <CardTitle className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+                <CardTitle className="text-sm font-semibold text-slate-600 flex items-center gap-2">
                     <Bell className="w-4 h-4" /> Notifications
                 </CardTitle>
             </CardHeader>
@@ -49,10 +49,10 @@ export function ClientNotifications() {
     return (
         <Card className="border-none shadow-sm ring-1 ring-slate-200 bg-white">
             <CardHeader className="pb-3 border-b border-slate-50">
-                <CardTitle className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                    <Bell className="w-4 h-4 text-emerald-500" />
+                <CardTitle className="text-sm font-semibold text-slate-600 flex items-center gap-2">
+                    <Bell className="w-4 h-4 text-red-500" />
                     Dernières Actualités
-                    <span className="ml-auto bg-emerald-100 text-emerald-600 text-[10px] px-2 py-0.5 rounded-full">
+                    <span className="ml-auto bg-red-100 text-red-600 text-[10px] px-2 py-0.5 rounded-full">
                         {notifications.length}
                     </span>
                 </CardTitle>
@@ -64,7 +64,7 @@ export function ClientNotifications() {
                             <div className={cn(
                                 "rounded-full p-2 shrink-0 mt-0.5",
                                 activity.type === 'INVOICE_SENT' && "bg-amber-50 text-amber-600",
-                                activity.type === 'PAYMENT_RECEIVED' && "bg-emerald-50 text-emerald-600",
+                                activity.type === 'PAYMENT_RECEIVED' && "bg-red-50 text-red-600",
                                 activity.type === 'PHASE_COMPLETED' && "bg-blue-50 text-blue-600",
                             )}>
                                 {activity.type === 'INVOICE_SENT' && <FileText className="w-4 h-4" />}

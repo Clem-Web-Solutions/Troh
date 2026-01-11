@@ -55,7 +55,7 @@ export function AppRoutes({ currentPath, selectedProjectId, onNavigate, onNaviga
                         <CardContent className="pt-6">
                             <h2 className="text-xl font-semibold mb-2">Page en construction</h2>
                             <p className="text-slate-500">
-                                La section <span className="font-medium text-slate-900">{currentPath}</span> est bientôt disponible.
+                                La section <span className="font-medium text-slate-600">{currentPath}</span> est bientôt disponible.
                             </p>
                         </CardContent>
                     </Card>

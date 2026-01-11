@@ -43,8 +43,8 @@ export function LoginPage({ onLogin }: LoginPageProps) {
             <div className="w-full max-w-md space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
 
                 <div className="text-center">
-                    <h1 className="text-4xl font-bold text-slate-900 tracking-tight mb-2">
-                        <span className="text-emerald-600">Meereo</span>
+                    <h1 className="text-4xl font-bold text-slate-600 tracking-tight mb-2">
+                        <span className="text-red-600">Meereo Project</span>
                     </h1>
                     <p className="text-slate-500">Connectez-vous à votre espace.</p>
                 </div>
@@ -67,7 +67,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                                     <input
                                         type="email"
                                         required
-                                        className="w-full pl-9 px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all"
+                                        className="w-full pl-9 px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none transition-all"
                                         placeholder="nom@exemple.com"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
@@ -82,7 +82,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                                     <input
                                         type="password"
                                         required
-                                        className="w-full pl-9 px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all"
+                                        className="w-full pl-9 px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none transition-all"
                                         placeholder="••••••••"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
@@ -92,7 +92,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
                             <Button
                                 type="submit"
-                                className="w-full bg-slate-900 hover:bg-slate-800 text-white"
+                                className="w-full bg-slate-600 hover:bg-slate-800 text-white"
                                 disabled={isLoading}
                             >
                                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Se connecter'}

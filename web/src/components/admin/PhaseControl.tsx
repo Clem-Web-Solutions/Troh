@@ -112,7 +112,7 @@ export function PhaseControl({ projectId }: PhaseControlProps) {
         <Card className="h-full flex flex-col">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                    <CheckSquare className="w-5 h-5 text-emerald-600" />
+                    <CheckSquare className="w-5 h-5 text-red-600" />
                     Contrôle d'Avancement
                 </CardTitle>
             </CardHeader>
@@ -149,13 +149,13 @@ export function PhaseControl({ projectId }: PhaseControlProps) {
                                             onClick={() => handleToggle(phase)}
                                             className={cn(
                                                 "w-5 h-5 min-w-[1.25rem] rounded border flex items-center justify-center transition-colors cursor-pointer",
-                                                isCompleted ? "bg-emerald-500 border-emerald-500 text-white" : "border-slate-300 hover:border-slate-400"
+                                                isCompleted ? "bg-red-500 border-red-500 text-white" : "border-slate-300 hover:border-slate-400"
                                             )}>
                                             {isCompleted && <CheckSquare className="w-3.5 h-3.5" />}
                                         </div>
                                         <span className={cn(
                                             "text-sm font-medium transition-colors flex-1 cursor-pointer select-none",
-                                            isCompleted ? "text-slate-900 line-through decoration-slate-400" : "text-slate-700"
+                                            isCompleted ? "text-slate-600 line-through decoration-slate-400" : "text-slate-700"
                                         )} onClick={() => handleToggle(phase)}>
                                             {phase.name}
                                         </span>
@@ -209,21 +209,21 @@ export function PhaseControl({ projectId }: PhaseControlProps) {
                                 type="text"
                                 value={newPhaseName}
                                 onChange={(e) => setNewPhaseName(e.target.value)}
-                                className="flex-1 text-sm border-b border-emerald-500 focus:outline-none py-1"
+                                className="flex-1 text-sm border-b border-red-500 focus:outline-none py-1"
                                 placeholder="Nom de l'étape..."
                                 onBlur={() => { if (!newPhaseName) setIsAdding(false); }}
                             />
-                            <Button type="submit" size="sm" variant="ghost" className="h-7 w-7 p-0 text-emerald-600"><Plus className="w-4 h-4" /></Button>
+                            <Button type="submit" size="sm" variant="ghost" className="h-7 w-7 p-0 text-red-600"><Plus className="w-4 h-4" /></Button>
                         </form>
                     ) : (
-                        <Button variant="ghost" size="sm" className="w-full text-slate-400 hover:text-emerald-600 border border-dashed border-slate-200 hover:border-emerald-200" onClick={() => setIsAdding(true)}>
+                        <Button variant="ghost" size="sm" className="w-full text-slate-400 hover:text-red-600 border border-dashed border-slate-200 hover:border-red-200" onClick={() => setIsAdding(true)}>
                             <Plus className="w-4 h-4 mr-2" /> Ajouter une étape
                         </Button>
                     )}
                 </div>
 
                 <div className="pt-4 border-t border-slate-100 mt-auto">
-                    <div className="flex items-center gap-2 text-slate-900 font-medium mb-3">
+                    <div className="flex items-center gap-2 text-slate-600 font-medium mb-3">
                         <MessagesSquare className="w-4 h-4" />
                         <span>Mises à jour Client</span>
                     </div>

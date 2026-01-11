@@ -89,7 +89,7 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                 return (
                     <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500">
                         {/* Welcome Banner */}
-                        <div className="bg-slate-900 rounded-2xl p-8 text-white relative overflow-hidden">
+                        <div className="bg-slate-600 rounded-2xl p-8 text-white relative overflow-hidden">
                             <div className="relative z-10">
                                 <h1 className="text-3xl font-bold mb-2">Bonjour, {project.client?.name || 'Client'}</h1>
                                 <p className="text-slate-300 max-w-xl">
@@ -97,7 +97,7 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                                     Voici ce qu'il se passe aujourd'hui.
                                 </p>
                             </div>
-                            <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-emerald-500/10 rotate-12 transform translate-x-10" />
+                            <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-red-500/10 rotate-12 transform translate-x-10" />
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -108,9 +108,9 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                                 </CardHeader>
                                 <CardContent>
                                     <div className="flex items-center justify-between mb-4">
-                                        <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
+                                        <h2 className="text-2xl font-bold text-slate-600 flex items-center gap-3">
                                             {currentPhase.name}
-                                            <span className="text-xs font-medium bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full">
+                                            <span className="text-xs font-medium bg-red-100 text-red-700 px-2 py-1 rounded-full">
                                                 En cours
                                             </span>
                                         </h2>
@@ -118,7 +118,7 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                                     </div>
                                     <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
                                         <div
-                                            className="h-full bg-emerald-500 rounded-full transition-all duration-1000"
+                                            className="h-full bg-red-500 rounded-full transition-all duration-1000"
                                             style={{ width: `${progress}%` }}
                                         />
                                     </div>
@@ -137,17 +137,17 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                         {/* Recent Activity / Quick Stats Row */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {/* Finance Widget */}
-                            <Card className="border-slate-200 hover:border-emerald-200 cursor-pointer transition-colors group" onClick={() => setActiveView('finance')}>
+                            <Card className="border-slate-200 hover:border-red-200 cursor-pointer transition-colors group" onClick={() => setActiveView('finance')}>
                                 <CardContent className="p-6">
                                     <div className="flex items-start justify-between">
                                         <div>
                                             <p className="text-sm font-medium text-slate-500 mb-1">Budget Consommé</p>
-                                            <h3 className="text-2xl font-bold text-slate-900">
+                                            <h3 className="text-2xl font-bold text-slate-600">
                                                 {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(finance?.paidAmount || 0)}
                                             </h3>
                                         </div>
-                                        <div className="p-2 bg-slate-50 rounded-lg group-hover:bg-emerald-50 transition-colors">
-                                            <Wallet className="w-5 h-5 text-slate-400 group-hover:text-emerald-500" />
+                                        <div className="p-2 bg-slate-50 rounded-lg group-hover:bg-red-50 transition-colors">
+                                            <Wallet className="w-5 h-5 text-slate-400 group-hover:text-red-500" />
                                         </div>
                                     </div>
                                     <div className="mt-4 text-xs text-slate-400">
@@ -162,7 +162,7 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                                     <div className="flex items-start justify-between">
                                         <div>
                                             <p className="text-sm font-medium text-slate-500 mb-1">Derniers Documents</p>
-                                            <h3 className="text-2xl font-bold text-slate-900">
+                                            <h3 className="text-2xl font-bold text-slate-600">
                                                 {project.documents?.length || 0}
                                             </h3>
                                         </div>
@@ -177,7 +177,7 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                             </Card>
 
                             {/* Contact Widget */}
-                            <Card className="border-slate-200 bg-slate-900 text-white">
+                            <Card className="border-slate-200 bg-slate-600 text-white">
                                 <CardContent className="p-6 flex flex-col h-full justify-between">
                                     <div className="flex items-center gap-3">
                                         <div className="h-10 w-10 rounded-full bg-slate-700 flex items-center justify-center font-bold">
@@ -212,7 +212,7 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                 !isMobileMenuOpen && "-translate-x-full"
             )}>
                 <div className="p-6 flex-1">
-                    <div className="flex items-center gap-2 mb-8 text-emerald-600 font-bold text-xl">
+                    <div className="flex items-center gap-2 mb-8 text-red-600 font-bold text-xl">
                         <Hammer className="w-6 h-6" />
                         <span>Espace Client</span>
                     </div>
@@ -224,8 +224,8 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                                 className={cn(
                                     "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
                                     activeView === item.id
-                                        ? "bg-slate-900 text-white shadow-md shadow-slate-900/20"
-                                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                                        ? "bg-slate-600 text-white shadow-md shadow-slate-600/20"
+                                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-600"
                                 )}
                             >
                                 <item.icon className="w-4 h-4" />
@@ -260,7 +260,7 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                     <Button variant="ghost" className="h-10 w-10 p-0" onClick={() => setIsMobileMenuOpen(true)}>
                         <Menu className="w-6 h-6" />
                     </Button>
-                    <span className="font-semibold text-slate-900">Troh Immo</span>
+                    <span className="font-semibold text-slate-600">Troh Immo</span>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-4 lg:p-8">
@@ -275,7 +275,7 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
             {/* Mobile Backdrop */}
             {isMobileMenuOpen && (
                 <div
-                    className="fixed inset-0 bg-slate-900/50 z-40 lg:hidden"
+                    className="fixed inset-0 bg-slate-600/50 z-40 lg:hidden"
                     onClick={() => setIsMobileMenuOpen(false)}
                 />
             )}

@@ -20,15 +20,11 @@ async function clearData() {
             return;
         }
 
-        // 2. Identify projects belonging to these users
-        const projects = await Project.findAll({
-            where: {
-                clientId: { [Op.in]: nonAdminUserIds }
-            }
-        });
+        // 2. Identify ALL projects (we want to clear all data)
+        const projects = await Project.findAll();
 
         const projectIds = projects.map(p => p.id);
-        console.log(`Found ${projectIds.length} projects to delete.`);
+        console.log(`Found ${projectIds.length} projects to delete (ALL).`);
 
         if (projectIds.length > 0) {
             // 3. Delete dependencies of these projects

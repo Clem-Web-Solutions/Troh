@@ -82,13 +82,13 @@ export function FinanceForm({ projectId }: FinanceFormProps) {
                 <Card className="bg-slate-50 border-slate-100">
                     <CardContent className="p-4">
                         <p className="text-xs text-slate-500 uppercase font-semibold">Total Payé</p>
-                        <p className="text-2xl font-bold text-emerald-600">{summary?.totalPaid?.toLocaleString()} €</p>
+                        <p className="text-2xl font-bold text-red-600">{summary?.totalPaid?.toLocaleString()} €</p>
                     </CardContent>
                 </Card>
                 <Card className="bg-slate-50 border-slate-100">
                     <CardContent className="p-4">
                         <p className="text-xs text-slate-500 uppercase font-semibold">Total Facturé</p>
-                        <p className="text-2xl font-bold text-slate-900">{summary?.totalInvoiced?.toLocaleString()} €</p>
+                        <p className="text-2xl font-bold text-slate-600">{summary?.totalInvoiced?.toLocaleString()} €</p>
                     </CardContent>
                 </Card>
             </div>
@@ -99,7 +99,7 @@ export function FinanceForm({ projectId }: FinanceFormProps) {
                     {/* Payment */}
                     <div className="flex gap-3 items-end">
                         <div className="flex-1 space-y-1">
-                            <label className="text-xs font-semibold text-slate-900">Enregistrer un Paiement</label>
+                            <label className="text-xs font-semibold text-slate-600">Enregistrer un Paiement</label>
                             <div className="relative">
                                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium">€</span>
                                 <input
@@ -113,7 +113,7 @@ export function FinanceForm({ projectId }: FinanceFormProps) {
                         </div>
                         <Button
                             size="sm"
-                            className="bg-slate-900 text-white"
+                            className="bg-slate-600 text-white"
                             onClick={() => handleAddTransaction('Payment')}
                             disabled={isSubmitting}
                         >
@@ -126,7 +126,7 @@ export function FinanceForm({ projectId }: FinanceFormProps) {
                     {/* Invoice */}
                     <div className="flex gap-3 items-end">
                         <div className="flex-[2] space-y-1">
-                            <label className="text-xs font-semibold text-slate-900">Nouvel Appel de Fonds</label>
+                            <label className="text-xs font-semibold text-slate-600">Nouvel Appel de Fonds</label>
                             <input
                                 type="text"
                                 placeholder="Libellé (ex: Phase 2 - 30%)"
@@ -136,7 +136,7 @@ export function FinanceForm({ projectId }: FinanceFormProps) {
                             />
                         </div>
                         <div className="flex-1 space-y-1">
-                            <label className="text-xs font-semibold text-slate-900">Montant</label>
+                            <label className="text-xs font-semibold text-slate-600">Montant</label>
                             <div className="relative">
                                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium">€</span>
                                 <input
@@ -176,11 +176,11 @@ export function FinanceForm({ projectId }: FinanceFormProps) {
                             {transactions.map((tx) => (
                                 <div key={tx.id} className="p-3 flex items-center justify-between hover:bg-slate-50 group">
                                     <div className="flex items-center gap-3">
-                                        <div className={`p-2 rounded-full ${tx.type === 'Payment' ? 'bg-emerald-100 text-emerald-600' : 'bg-blue-50 text-blue-600'}`}>
+                                        <div className={`p-2 rounded-full ${tx.type === 'Payment' ? 'bg-red-100 text-red-600' : 'bg-blue-50 text-blue-600'}`}>
                                             {tx.type === 'Payment' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownLeft className="w-4 h-4" />}
                                         </div>
                                         <div>
-                                            <p className="text-sm font-medium text-slate-900">{tx.description || '-'}</p>
+                                            <p className="text-sm font-medium text-slate-600">{tx.description || '-'}</p>
                                             <p className="text-xs text-slate-500">
                                                 {new Date(tx.date).toLocaleDateString()}
                                                 {tx.status === 'Pending' && <span className="ml-2 text-amber-600 font-medium">En attente</span>}
@@ -188,7 +188,7 @@ export function FinanceForm({ projectId }: FinanceFormProps) {
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-4">
-                                        <span className={`font-semibold text-sm ${tx.type === 'Payment' ? 'text-emerald-600' : 'text-slate-900'}`}>
+                                        <span className={`font-semibold text-sm ${tx.type === 'Payment' ? 'text-red-600' : 'text-slate-600'}`}>
                                             {tx.type === 'Payment' ? '+' : '-'} {Number(tx.amount).toLocaleString()} €
                                         </span>
                                         <button

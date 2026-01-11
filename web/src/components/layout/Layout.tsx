@@ -36,8 +36,8 @@ export function Layout({ children, currentPath, onNavigate, role, onLogout }: La
             )}>
                 {/* Mobile Header */}
                 <div className="md:hidden h-16 bg-white border-b border-slate-200 px-4 flex items-center justify-between sticky top-0 z-30">
-                    <div className="flex items-center gap-2 font-bold text-xl text-slate-900">
-                        <span className="text-emerald-600">TROH</span> Immo
+                    <div className="flex items-center gap-2 font-bold text-xl text-slate-600">
+                        <span className="text-red-600">TROH</span> Immo
                     </div>
                     <button
                         onClick={() => setIsMobileOpen(true)}

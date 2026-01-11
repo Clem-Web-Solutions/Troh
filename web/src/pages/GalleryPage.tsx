@@ -9,7 +9,7 @@ export function GalleryPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Galerie Chantier</h1>
+                    <h1 className="text-3xl font-bold text-slate-600 tracking-tight">Galerie Chantier</h1>
                     <p className="text-slate-500 mt-1">L'évolution de votre projet en images.</p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -29,9 +29,9 @@ export function GalleryPage() {
 
             {/* Additional "On Demand" Section (Mockup) */}
             <div className="mt-12">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Vidéos & Timelapse</h3>
+                <h3 className="text-lg font-semibold text-slate-600 mb-4">Vidéos & Timelapse</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card className="aspect-video bg-slate-900 flex items-center justify-center group cursor-pointer overflow-hidden relative">
+                    <Card className="aspect-video bg-slate-600 flex items-center justify-center group cursor-pointer overflow-hidden relative">
                         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-50 group-hover:opacity-60 transition-opacity" />
                         <div className="h-16 w-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center z-10 group-hover:scale-110 transition-transform">
                             <div className="w-0 h-0 border-t-8 border-t-transparent border-l-12 border-l-white border-b-8 border-b-transparent ml-1" />
