@@ -3,6 +3,7 @@ const User = require('./User');
 const Project = require('./Project');
 const Phase = require('./Phase');
 const Document = require('./Document');
+const Folder = require('./Folder');
 const Finance = require('./Finance');
 const Activity = require('./Activity');
 const Transaction = require('./Transaction');
@@ -18,7 +19,15 @@ Project.belongsTo(User, { foreignKey: 'projectManagerId', as: 'projectManager' }
 Project.hasMany(Phase, { foreignKey: 'projectId', as: 'phases' });
 Phase.belongsTo(Project, { foreignKey: 'projectId', as: 'project' });
 
-// Project <-> Documents
+// Project <-> Folders
+Project.hasMany(Folder, { foreignKey: 'projectId', as: 'folders' });
+Folder.belongsTo(Project, { foreignKey: 'projectId', as: 'project' });
+
+// Folder <-> Documents
+Folder.hasMany(Document, { foreignKey: 'folderId', as: 'documents' });
+Document.belongsTo(Folder, { foreignKey: 'folderId', as: 'folder' });
+
+// Project <-> Documents (Direct Documents)
 Project.hasMany(Document, { foreignKey: 'projectId', as: 'documents' });
 Document.belongsTo(Project, { foreignKey: 'projectId', as: 'project' });
 
@@ -40,6 +49,7 @@ module.exports = {
     Project,
     Phase,
     Document,
+    Folder,
     Finance,
     Activity,
     Transaction,

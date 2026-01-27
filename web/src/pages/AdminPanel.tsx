@@ -60,17 +60,19 @@ export function AdminPanel({ onNavigateToProject }: AdminPanelProps) {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
 
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-600 tracking-tight">Projets</h1>
-                    <p className="text-slate-500 mt-1">Gérez l'ensemble de vos projets immobiliers.</p>
+            <div className="flex flex-col gap-3 sm:gap-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-slate-600 tracking-tight">Projets</h1>
+                        <p className="text-sm sm:text-base text-slate-500 mt-1">Gérez l'ensemble de vos projets immobiliers.</p>
+                    </div>
+                    <Button onClick={() => setIsCreateModalOpen(true)} className="gap-2 bg-red-600 hover:bg-red-700 w-full sm:w-auto">
+                        <Plus className="w-4 h-4" /> <span className="hidden sm:inline">Nouveau Projet</span><span className="sm:hidden">Nouveau</span>
+                    </Button>
                 </div>
-                <Button onClick={() => setIsCreateModalOpen(true)} className="gap-2 bg-red-600 hover:bg-red-700">
-                    <Plus className="w-4 h-4" /> Nouveau Projet
-                </Button>
             </div>
 
             {/* Projects Table */}

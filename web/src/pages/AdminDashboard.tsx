@@ -45,15 +45,15 @@ export function AdminDashboard() {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header */}
             <div>
-                <h1 className="text-3xl font-bold text-slate-600 tracking-tight">Tableau de bord</h1>
-                <p className="text-slate-500 mt-1">Vue synthétique de l'activité.</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-600 tracking-tight">Tableau de bord</h1>
+                <p className="text-sm sm:text-base text-slate-500 mt-1">Vue synthétique de l'activité.</p>
             </div>
 
             {/* KPI Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium text-slate-500">Projets Actifs</CardTitle>
@@ -88,20 +88,20 @@ export function AdminDashboard() {
             </div>
 
             {/* Charts & Activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
                 {/* Activity Chart */}
                 <Card className="lg:col-span-2">
                     <CardHeader>
-                        <CardTitle>Activité de la plateforme</CardTitle>
+                        <CardTitle className="text-base sm:text-lg">Activité de la plateforme</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="h-[300px] w-full">
+                        <div className="h-[250px] sm:h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart data={stats}>
                                     <defs>
                                         <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
-                                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                            <stop offset="5%" stopColor="#FF9C38" stopOpacity={0.1} />
+                                            <stop offset="95%" stopColor="#FF9C38" stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -109,9 +109,9 @@ export function AdminDashboard() {
                                     <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
                                     <Tooltip
                                         contentStyle={{ backgroundColor: '#fff', borderRadius: '8px', border: '1px solid #e2e8f0' }}
-                                        cursor={{ stroke: '#10b981', strokeWidth: 1 }}
+                                        cursor={{ stroke: '#FF9C38', strokeWidth: 1 }}
                                     />
-                                    <Area type="monotone" dataKey="count" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorCount)" />
+                                    <Area type="monotone" dataKey="count" stroke="#FF9C38" strokeWidth={2} fillOpacity={1} fill="url(#colorCount)" />
                                 </AreaChart>
                             </ResponsiveContainer>
                         </div>
@@ -121,26 +121,26 @@ export function AdminDashboard() {
                 {/* Notifications Feed */}
                 <Card>
                     <CardHeader>
-                        <CardTitle>Dernières notifications</CardTitle>
+                        <CardTitle className="text-base sm:text-lg">Dernières notifications</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-6">
+                        <div className="space-y-4 sm:space-y-6">
                             {activities.length === 0 ? (
                                 <p className="text-sm text-slate-500 text-center py-4">Aucune activité récente.</p>
                             ) : (
                                 activities.map((activity) => (
-                                    <div key={activity.id} className="flex gap-4">
+                                    <div key={activity.id} className="flex gap-3 sm:gap-4">
                                         <div className="mt-1">
-                                            <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center border border-slate-100">
+                                            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-50 flex items-center justify-center border border-slate-100">
                                                 {getActivityIcon(activity.type)}
                                             </div>
                                         </div>
-                                        <div className="flex-1 space-y-1">
-                                            <p className="text-sm font-medium leading-none text-slate-600">{activity.description}</p>
-                                            <div className="flex items-center gap-2 text-xs text-slate-500">
+                                        <div className="flex-1 space-y-1 min-w-0">
+                                            <p className="text-sm font-medium leading-none text-slate-600 truncate">{activity.description}</p>
+                                            <div className="flex items-center gap-2 text-xs text-slate-500 flex-wrap">
                                                 <span>{new Date(activity.createdAt).toLocaleTimeString()}</span>
                                                 {activity.project && (
-                                                    <span className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">
+                                                    <span className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-600 truncate max-w-[120px]">
                                                         {activity.project.name}
                                                     </span>
                                                 )}

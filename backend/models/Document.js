@@ -15,12 +15,20 @@ const Document = sequelize.define('Document', {
             key: 'id',
         },
     },
+    folderId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: 'Folders',
+            key: 'id',
+        },
+    },
     name: {
         type: DataTypes.STRING,
         allowNull: false,
     },
     category: {
-        type: DataTypes.ENUM('Plans', 'Administratif', 'Financier', 'Technique', 'Photos', 'Autre'),
+        type: DataTypes.ENUM('Plans', 'Administratif', 'Financier', 'Technique', 'Photos', 'PV', 'Autre'),
         defaultValue: 'Autre',
     },
     url: {

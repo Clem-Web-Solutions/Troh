@@ -64,19 +64,19 @@ export function ChangePasswordPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-3 sm:p-4">
             <Card className="w-full max-w-md animate-in fade-in zoom-in-95 duration-500">
-                <CardHeader className="text-center pb-2">
-                    <div className="mx-auto w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-4">
-                        <Lock className="w-6 h-6 text-amber-600" />
+                <CardHeader className="text-center pb-2 px-4 sm:px-6">
+                    <div className="mx-auto w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-full flex items-center justify-center mb-3 sm:mb-4">
+                        <Lock className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
                     </div>
-                    <CardTitle className="text-xl font-bold text-slate-600">Sécurité du compte</CardTitle>
-                    <p className="text-sm text-slate-500 mt-2">
+                    <CardTitle className="text-lg sm:text-xl font-bold text-slate-600">Sécurité du compte</CardTitle>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-2">
                         Pour votre première connexion, vous devez définir un nouveau mot de passe personnel.
                     </p>
                 </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+                    <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
                         {error && (
                             <div className="p-3 bg-red-50 text-red-600 text-sm rounded flex items-center gap-2">
                                 <AlertCircle className="w-4 h-4" /> {error}

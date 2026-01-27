@@ -94,6 +94,32 @@ export const api = {
         return res.json();
     },
 
+    // Folders
+    createFolder: async (data: { projectId: string | number, name: string, date?: string, type?: 'DOCUMENTS' | 'PHOTOS' }) => {
+        const res = await fetch(`${API_URL}/folders`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Failed to create folder');
+        return res.json();
+    },
+    getFolders: async (projectId: string | number, type?: 'DOCUMENTS' | 'PHOTOS') => {
+        let url = `${API_URL}/folders/${projectId}`;
+        if (type) url += `?type=${type}`;
+        const res = await fetch(url, { headers: getHeaders() });
+        if (!res.ok) throw new Error('Failed to fetch folders');
+        return res.json();
+    },
+    deleteFolder: async (id: number) => {
+        const res = await fetch(`${API_URL}/folders/${id}`, {
+            method: 'DELETE',
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error('Failed to delete folder');
+        return res.json();
+    },
+
     // Documents
     getDocuments: async (projectId: string) => {
         const res = await fetch(`${API_URL}/documents/${projectId}`, { headers: getHeaders() });

@@ -42,7 +42,7 @@ export function CreateProjectModal({ isOpen, onClose, onSubmit }: CreateProjectM
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-slate-600/40 backdrop-blur-sm animate-in fade-in"
@@ -50,20 +50,20 @@ export function CreateProjectModal({ isOpen, onClose, onSubmit }: CreateProjectM
             />
 
             {/* Modal */}
-            <div className="relative w-full max-w-xl bg-white rounded-xl shadow-2xl p-6 m-4 animate-in zoom-in-95 duration-200">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-slate-600">Nouveau Projet</h2>
+            <div className="relative w-full max-w-xl bg-white rounded-xl shadow-2xl p-4 sm:p-6 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+                <div className="flex items-center justify-between mb-4 sm:mb-6 sticky top-0 bg-white z-10 pb-2">
+                    <h2 className="text-lg sm:text-xl font-bold text-slate-600">Nouveau Projet</h2>
                     <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
                         <X className="w-5 h-5 text-slate-500" />
                     </button>
                 </div>
 
-                <form className="space-y-6" onSubmit={handleSubmit}>
+                <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
 
                     {/* Client Info */}
-                    <div className="space-y-4">
-                        <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider">Informations Client</h3>
-                        <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-3 sm:space-y-4">
+                        <h3 className="text-xs sm:text-sm font-medium text-slate-500 uppercase tracking-wider">Informations Client</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-slate-700">Client</label>
                                 <div className="relative">
@@ -71,7 +71,7 @@ export function CreateProjectModal({ isOpen, onClose, onSubmit }: CreateProjectM
                                     <select
                                         value={formData.client}
                                         onChange={(e) => setFormData({ ...formData, client: e.target.value })}
-                                        className="w-full pl-9 px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none appearance-none bg-white"
+                                        className="w-full pl-9 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none appearance-none bg-white"
                                         required
                                     >
                                         <option value="">Sélectionner un client...</option>
@@ -87,7 +87,7 @@ export function CreateProjectModal({ isOpen, onClose, onSubmit }: CreateProjectM
                                     type="email"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none"
+                                    className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none"
                                     placeholder="Auto-rempli..."
                                     readOnly={!!formData.client} // Make read-only if client selected, or auto-fill
                                 />
@@ -98,8 +98,8 @@ export function CreateProjectModal({ isOpen, onClose, onSubmit }: CreateProjectM
                     <div className="h-px bg-slate-100" />
 
                     {/* Project Info */}
-                    <div className="space-y-4">
-                        <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider">Détails Projet</h3>
+                    <div className="space-y-3 sm:space-y-4">
+                        <h3 className="text-xs sm:text-sm font-medium text-slate-500 uppercase tracking-wider">Détails Projet</h3>
 
                         {/* Project Manager Selection */}
                         <div className="space-y-2">
@@ -107,7 +107,7 @@ export function CreateProjectModal({ isOpen, onClose, onSubmit }: CreateProjectM
                             <div className="relative">
                                 <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <select
-                                    className="w-full pl-9 px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none appearance-none bg-white"
+                                    className="w-full pl-9 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none appearance-none bg-white"
                                     value={formData.projectManagerId}
                                     onChange={(e) => setFormData({ ...formData, projectManagerId: e.target.value })}
                                 >
@@ -127,13 +127,13 @@ export function CreateProjectModal({ isOpen, onClose, onSubmit }: CreateProjectM
                                     type="text"
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full pl-9 px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none"
+                                    className="w-full pl-9 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none"
                                     placeholder="ex: Rénovation Villa"
                                     required
                                 />
                             </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-slate-700">Budget (€)</label>
                                 <div className="relative">
@@ -142,7 +142,7 @@ export function CreateProjectModal({ isOpen, onClose, onSubmit }: CreateProjectM
                                         type="number"
                                         value={formData.budget}
                                         onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                                        className="w-full pl-9 px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none"
+                                        className="w-full pl-9 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none"
                                         placeholder="150000"
                                     />
                                 </div>
@@ -155,16 +155,16 @@ export function CreateProjectModal({ isOpen, onClose, onSubmit }: CreateProjectM
                                         type="date"
                                         value={formData.startDate}
                                         onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                                        className="w-full pl-9 px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none"
+                                        className="w-full pl-9 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none"
                                     />
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex gap-3 pt-2">
-                        <Button type="button" variant="secondary" className="flex-1" onClick={onClose}>Annuler</Button>
-                        <Button type="submit" className="flex-1 bg-red-600 hover:bg-red-700">Créer le projet</Button>
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
+                        <Button type="button" variant="secondary" className="flex-1 order-2 sm:order-1" onClick={onClose}>Annuler</Button>
+                        <Button type="submit" className="flex-1 bg-red-600 hover:bg-red-700 order-1 sm:order-2">Créer le projet</Button>
                     </div>
 
                 </form>

@@ -39,19 +39,24 @@ export function LoginPage({ onLogin }: LoginPageProps) {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-            <div className="w-full max-w-md space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
-
-                <div className="text-center">
-                    <h1 className="text-4xl font-bold text-slate-600 tracking-tight mb-2">
-                        <span className="text-red-600">Meereo Project</span>
-                    </h1>
-                    <p className="text-slate-500">Connectez-vous à votre espace.</p>
-                </div>
+        <div className="min-h-screen bg-white flex items-center justify-center p-3 sm:p-4 relative">
+            <img 
+                src="/meereo.png" 
+                alt="Construction worker" 
+                className="absolute left-0 right-0 w-full h-auto max-w-6xl mx-auto hidden sm:block"
+                style={{ zIndex: 0, top: '-50px' }}
+            />
+            
+            <div className="absolute bottom-4 sm:bottom-8 left-4 sm:left-8 flex items-center gap-2 sm:gap-4" style={{ zIndex: 10 }}>
+                <img src="/logo_meereo.png" alt="Meereo" className="h-16 sm:h-20 lg:h-28 w-auto" />
+                <img src="/ruzibiza.jpeg" alt="Ruzibiza" className="h-14 sm:h-16 lg:h-24 w-auto" />
+            </div>
+            
+            <div className="w-full max-w-md relative" style={{ zIndex: 10 }}>
 
                 <Card className="border-slate-200 shadow-xl">
-                    <CardContent className="p-8">
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                    <CardContent className="p-5 sm:p-6 lg:p-8">
+                        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
 
                             {error && (
                                 <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg flex items-center gap-2">
@@ -92,7 +97,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
                             <Button
                                 type="submit"
-                                className="w-full bg-slate-600 hover:bg-slate-800 text-white"
+                                className="w-full bg-sky-500 hover:bg-blue-500 text-white"
                                 disabled={isLoading}
                             >
                                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Se connecter'}
@@ -102,10 +107,9 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                     </CardContent>
                 </Card>
 
-                <p className="text-center text-sm text-slate-400">
+                <p className="text-center text-sm text-slate-400 mt-4">
                     Pas encore de compte ? Contactez votre administrateur.
                 </p>
-
             </div>
         </div>
     );

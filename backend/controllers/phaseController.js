@@ -65,6 +65,10 @@ exports.updatePhase = async (req, res) => {
             phase.description = req.body.description;
         }
 
+        if (req.body.subtasks !== undefined) {
+            phase.subtasks = req.body.subtasks;
+        }
+
         await phase.save();
 
         // Recalculate Project Progress

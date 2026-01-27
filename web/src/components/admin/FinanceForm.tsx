@@ -76,28 +76,28 @@ export function FinanceForm({ projectId }: FinanceFormProps) {
     if (isLoading) return <div className="flex justify-center p-8"><Loader2 className="animate-spin" /></div>;
 
     return (
-        <div className="space-y-6 h-full flex flex-col">
+        <div className="space-y-4 sm:space-y-6 h-full flex flex-col">
             {/* Stats Cards */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <Card className="bg-slate-50 border-slate-100">
-                    <CardContent className="p-4">
-                        <p className="text-xs text-slate-500 uppercase font-semibold">Total Payé</p>
-                        <p className="text-2xl font-bold text-red-600">{summary?.totalPaid?.toLocaleString()} €</p>
+                    <CardContent className="p-3 sm:p-4">
+                        <p className="text-[10px] sm:text-xs text-slate-500 uppercase font-semibold">Total Payé</p>
+                        <p className="text-lg sm:text-xl lg:text-2xl font-bold text-red-600">{summary?.totalPaid?.toLocaleString()} €</p>
                     </CardContent>
                 </Card>
                 <Card className="bg-slate-50 border-slate-100">
-                    <CardContent className="p-4">
-                        <p className="text-xs text-slate-500 uppercase font-semibold">Total Facturé</p>
-                        <p className="text-2xl font-bold text-slate-600">{summary?.totalInvoiced?.toLocaleString()} €</p>
+                    <CardContent className="p-3 sm:p-4">
+                        <p className="text-[10px] sm:text-xs text-slate-500 uppercase font-semibold">Total Facturé</p>
+                        <p className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-600">{summary?.totalInvoiced?.toLocaleString()} €</p>
                     </CardContent>
                 </Card>
             </div>
 
             {/* Input Forms */}
             <Card className="border-slate-200 shadow-sm shrink-0">
-                <CardContent className="p-4 space-y-4">
+                <CardContent className="p-3 sm:p-4 space-y-3 sm:space-y-4">
                     {/* Payment */}
-                    <div className="flex gap-3 items-end">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-end">
                         <div className="flex-1 space-y-1">
                             <label className="text-xs font-semibold text-slate-600">Enregistrer un Paiement</label>
                             <div className="relative">

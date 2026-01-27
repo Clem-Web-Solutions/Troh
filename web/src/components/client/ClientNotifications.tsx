@@ -48,31 +48,32 @@ export function ClientNotifications() {
 
     return (
         <Card className="border-none shadow-sm ring-1 ring-slate-200 bg-white">
-            <CardHeader className="pb-3 border-b border-slate-50">
-                <CardTitle className="text-sm font-semibold text-slate-600 flex items-center gap-2">
-                    <Bell className="w-4 h-4 text-red-500" />
-                    Dernières Actualités
-                    <span className="ml-auto bg-red-100 text-red-600 text-[10px] px-2 py-0.5 rounded-full">
+            <CardHeader className="pb-2 sm:pb-3 border-b border-slate-50 px-4 sm:px-6 py-3 sm:py-4">
+                <CardTitle className="text-xs sm:text-sm font-semibold text-slate-600 flex items-center gap-2">
+                    <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-500" />
+                    <span className="hidden sm:inline">Dernières Actualités</span>
+                    <span className="sm:hidden">Actualités</span>
+                    <span className="ml-auto bg-red-100 text-red-600 text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full">
                         {notifications.length}
                     </span>
                 </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-                <div className="max-h-[300px] overflow-y-auto">
+                <div className="max-h-[250px] sm:max-h-[300px] overflow-y-auto">
                     {notifications.map((activity) => (
-                        <div key={activity.id} className="p-4 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors flex gap-3 items-start">
+                        <div key={activity.id} className="p-3 sm:p-4 border-b border-slate-50 last:border-0 hover:bg-slate-50 transition-colors flex gap-2 sm:gap-3 items-start">
                             <div className={cn(
-                                "rounded-full p-2 shrink-0 mt-0.5",
+                                "rounded-full p-1.5 sm:p-2 shrink-0 mt-0.5",
                                 activity.type === 'INVOICE_SENT' && "bg-amber-50 text-amber-600",
                                 activity.type === 'PAYMENT_RECEIVED' && "bg-red-50 text-red-600",
                                 activity.type === 'PHASE_COMPLETED' && "bg-blue-50 text-blue-600",
                             )}>
-                                {activity.type === 'INVOICE_SENT' && <FileText className="w-4 h-4" />}
-                                {activity.type === 'PAYMENT_RECEIVED' && <CheckCircle2 className="w-4 h-4" />}
-                                {activity.type === 'PHASE_COMPLETED' && <Info className="w-4 h-4" />}
+                                {activity.type === 'INVOICE_SENT' && <FileText className="w-3 h-3 sm:w-4 sm:h-4" />}
+                                {activity.type === 'PAYMENT_RECEIVED' && <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4" />}
+                                {activity.type === 'PHASE_COMPLETED' && <Info className="w-3 h-3 sm:w-4 sm:h-4" />}
                             </div>
-                            <div>
-                                <p className="text-sm font-medium text-slate-800 leading-tight">
+                            <div className="min-w-0 flex-1">
+                                <p className="text-xs sm:text-sm font-medium text-slate-800 leading-tight truncate">
                                     {activity.type === 'INVOICE_SENT' && "Appel de fonds"}
                                     {activity.type === 'PAYMENT_RECEIVED' && "Paiement confirmé"}
                                     {activity.type === 'PHASE_COMPLETED' && "Avancement"}

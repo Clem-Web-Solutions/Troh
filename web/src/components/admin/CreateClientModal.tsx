@@ -48,7 +48,7 @@ export function CreateClientModal({ isOpen, onClose, onSubmit }: CreateClientMod
     };
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4">
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-slate-600/40 backdrop-blur-sm animate-in fade-in"
@@ -56,27 +56,27 @@ export function CreateClientModal({ isOpen, onClose, onSubmit }: CreateClientMod
             />
 
             {/* Modal */}
-            <div className="relative w-full max-w-xl bg-white rounded-xl shadow-2xl p-6 m-4 animate-in zoom-in-95 duration-200">
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-slate-600">Nouveau Client</h2>
+            <div className="relative w-full max-w-xl bg-white rounded-xl shadow-2xl p-4 sm:p-6 animate-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
+                <div className="flex items-center justify-between mb-4 sm:mb-6 sticky top-0 bg-white z-10 pb-2">
+                    <h2 className="text-lg sm:text-xl font-bold text-slate-600">Nouveau Client</h2>
                     <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
                         <X className="w-5 h-5 text-slate-500" />
                     </button>
                 </div>
 
-                <form className="space-y-6" onSubmit={handleSubmit}>
+                <form className="space-y-4 sm:space-y-6" onSubmit={handleSubmit}>
 
                     {/* Success State - Temp Password */}
                     {tempPassword && (
-                        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 animate-in fade-in slide-in-from-top-2">
-                            <div className="flex items-center gap-2 text-red-800 font-semibold mb-2">
-                                <span className="text-xl">🎉 Client créé avec succès !</span>
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4 mb-4 animate-in fade-in slide-in-from-top-2">
+                            <div className="flex items-center gap-2 text-red-800 font-semibold mb-2 text-sm sm:text-base">
+                                <span>🎉 Client créé avec succès !</span>
                             </div>
-                            <p className="text-sm text-red-700 mb-3">
+                            <p className="text-xs sm:text-sm text-red-700 mb-3">
                                 Voici le mot de passe provisoire à communiquer au client. Il devra le changer lors de sa première connexion.
                             </p>
-                            <div className="bg-white border border-red-200 rounded p-3 flex items-center justify-between">
-                                <code className="text-lg font-mono font-bold text-slate-800 tracking-wider select-all">{tempPassword}</code>
+                            <div className="bg-white border border-red-200 rounded p-2 sm:p-3 flex items-center justify-between">
+                                <code className="text-base sm:text-lg font-mono font-bold text-slate-800 tracking-wider select-all">{tempPassword}</code>
                                 <Button
                                     type="button"
                                     size="sm"
@@ -87,7 +87,7 @@ export function CreateClientModal({ isOpen, onClose, onSubmit }: CreateClientMod
                                     Copier
                                 </Button>
                             </div>
-                            <Button type="button" className="w-full mt-4 bg-red-600 hover:bg-red-700 text-white" onClick={onClose}>
+                            <Button type="button" className="w-full mt-3 sm:mt-4 bg-red-600 hover:bg-red-700 text-white" onClick={onClose}>
                                 Terminer
                             </Button>
                         </div>
@@ -96,8 +96,8 @@ export function CreateClientModal({ isOpen, onClose, onSubmit }: CreateClientMod
                     {!tempPassword && (
                         <>
                             {/* Personal Info */}
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider">Coordonnées</h3>
+                            <div className="space-y-3 sm:space-y-4">
+                                <h3 className="text-xs sm:text-sm font-medium text-slate-500 uppercase tracking-wider">Coordonnées</h3>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-slate-700">Nom Complet / Raison Sociale</label>
                                     <div className="relative">

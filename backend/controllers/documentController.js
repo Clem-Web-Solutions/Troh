@@ -2,7 +2,7 @@ const { Document, Activity } = require('../models');
 
 exports.uploadDocument = async (req, res) => {
     try {
-        const { projectId, category } = req.body;
+        const { projectId, category, folderId } = req.body;
 
         if (!req.file) {
             return res.status(400).json({ message: 'Aucun fichier uploadé' });
@@ -10,6 +10,7 @@ exports.uploadDocument = async (req, res) => {
 
         const document = await Document.create({
             projectId,
+            folderId: folderId ? parseInt(folderId) : null,
             name: req.file.originalname,
             category,
             url: `/uploads/${req.file.filename}`,

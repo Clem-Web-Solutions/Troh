@@ -44,14 +44,64 @@ exports.createProject = async (req, res) => {
             name,
             address,
             clientId,
-            projectManagerId: projectManagerId || req.user.id, // Assign selected PM or default to creator
+            projectManagerId: projectManagerId || req.user.id,
             status: 'Etude',
         });
 
-        // Optionnel: Créer des phases par défaut
-        const phases = ['Conception', 'Administratif', 'Travaux', 'Livraison'];
-        for (const phaseName of phases) {
-            await Phase.create({ projectId: project.id, name: phaseName });
+        // Créer les phases structurées par défaut
+        const defaultPhases = [
+            {
+                name: 'Études et conception',
+                category: 'Phase 1',
+                order: 1,
+                subtasks: [
+                    { name: 'Esquisse', completed: false },
+                    { name: 'APS (Avant-Projet Sommaire)', completed: false },
+                    { name: 'APD (Avant-Projet Définitif)', completed: false },
+                    { name: 'Dossier administratif', completed: false }
+                ]
+            },
+            {
+                name: 'Préparation travaux',
+                category: 'Phase 2',
+                order: 2,
+                subtasks: [
+                    { name: 'DCE (Dossier de Consultation des Entreprises)', completed: false },
+                    { name: 'Consultation entreprises', completed: false },
+                    { name: 'Planning prévisionnel', completed: false }
+                ]
+            },
+            {
+                name: 'Réalisation',
+                category: 'Phase 3',
+                order: 3,
+                subtasks: [
+                    { name: 'Démarrage chantier', completed: false },
+                    { name: 'Avancement par lots', completed: false },
+                    { name: 'Jalons clés', completed: false }
+                ]
+            },
+            {
+                name: 'Livraison',
+                category: 'Phase 4',
+                order: 4,
+                subtasks: [
+                    { name: 'Réception', completed: false },
+                    { name: 'Levée de réserves', completed: false },
+                    { name: 'DOE (Dossier des Ouvrages Exécutés)', completed: false }
+                ]
+            }
+        ];
+
+        for (const phaseData of defaultPhases) {
+            await Phase.create({
+                projectId: project.id,
+                name: phaseData.name,
+                category: phaseData.category,
+                order: phaseData.order,
+                subtasks: phaseData.subtasks,
+                status: 'pending'
+            });
         }
 
         res.status(201).json(project);

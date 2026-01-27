@@ -21,6 +21,19 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
     const [isLoading, setIsLoading] = useState(true);
     const [activeView, setActiveView] = useState<View>('overview');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [userName, setUserName] = useState<string>('Client');
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            try {
+                const user = JSON.parse(storedUser);
+                setUserName(user.name || 'Client');
+            } catch (e) {
+                console.error('Failed to parse user from localStorage', e);
+            }
+        }
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -33,8 +46,25 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                         api.getFinance(mainProject.id).catch(() => null),
                         api.getPhases(mainProject.id).catch(() => [])
                     ]);
+                    
+                    console.log('📊 Phases récupérées:', phasesData);
+                    
+                    // Parse subtasks if they come as JSON strings
+                    const parsedPhases = phasesData.map((phase: any) => {
+                        if (phase.subtasks && typeof phase.subtasks === 'string') {
+                            try {
+                                phase.subtasks = JSON.parse(phase.subtasks);
+                            } catch (e) {
+                                console.error('Failed to parse subtasks:', e);
+                                phase.subtasks = [];
+                            }
+                        }
+                        console.log(`Phase "${phase.name}":`, phase.subtasks);
+                        return phase;
+                    });
+                    
                     // Sort phases by Order, then Date, then ID
-                    const sortedPhases = phasesData.sort((a: any, b: any) => {
+                    const sortedPhases = parsedPhases.sort((a: any, b: any) => {
                         const orderA = a.order || 0;
                         const orderB = b.order || 0;
                         if (orderA !== orderB) return orderA - orderB;
@@ -87,12 +117,12 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
         switch (activeView) {
             case 'overview':
                 return (
-                    <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500">
+                    <div className="space-y-4 sm:space-y-6 animate-in fade-in zoom-in-95 duration-500">
                         {/* Welcome Banner */}
-                        <div className="bg-slate-600 rounded-2xl p-8 text-white relative overflow-hidden">
+                        <div className="bg-slate-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 lg:p-8 text-white relative overflow-hidden">
                             <div className="relative z-10">
-                                <h1 className="text-3xl font-bold mb-2">Bonjour, {project.client?.name || 'Client'}</h1>
-                                <p className="text-slate-300 max-w-xl">
+                                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2">Bonjour, {userName}</h1>
+                                <p className="text-sm sm:text-base text-slate-300 max-w-xl">
                                     Bienvenue sur votre espace. Votre projet <strong className="text-white">{project.name}</strong> avance bien.
                                     Voici ce qu'il se passe aujourd'hui.
                                 </p>
@@ -100,31 +130,33 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                             <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-red-500/10 rotate-12 transform translate-x-10" />
                         </div>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
                             {/* Main Status Card */}
                             <Card className="lg:col-span-2 border-slate-200">
                                 <CardHeader className="pb-2">
-                                    <CardTitle className="text-base font-medium text-slate-500">Phase Actuelle</CardTitle>
+                                    <CardTitle className="text-sm sm:text-base font-medium text-slate-500">Phase Actuelle</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h2 className="text-2xl font-bold text-slate-600 flex items-center gap-3">
-                                            {currentPhase.name}
-                                            <span className="text-xs font-medium bg-red-100 text-red-700 px-2 py-1 rounded-full">
+                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
+                                        <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-600 flex items-center gap-2 sm:gap-3 flex-wrap">
+                                            <span className="truncate max-w-[200px] sm:max-w-none">{currentPhase.name}</span>
+                                            <span className="text-xs font-medium bg-red-100 text-red-700 px-2 py-1 rounded-full whitespace-nowrap">
                                                 En cours
                                             </span>
                                         </h2>
-                                        <span className="text-2xl font-bold text-slate-300">{progress}%</span>
+                                        <span className="text-xl sm:text-2xl font-bold text-slate-300">{progress}%</span>
                                     </div>
-                                    <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                                    <div className="w-full h-2 sm:h-3 bg-slate-100 rounded-full overflow-hidden">
                                         <div
                                             className="h-full bg-red-500 rounded-full transition-all duration-1000"
                                             style={{ width: `${progress}%` }}
                                         />
                                     </div>
-                                    <div className="mt-6 flex gap-3">
-                                        <Button onClick={() => setActiveView('planning')} className="gap-2">
-                                            Voir le planning complet <ArrowRight className="w-4 h-4" />
+                                    <div className="mt-4 sm:mt-6 flex gap-3">
+                                        <Button onClick={() => setActiveView('planning')} className="gap-2 text-sm">
+                                            <span className="hidden sm:inline">Voir le planning complet</span>
+                                            <span className="sm:hidden">Planning</span>
+                                            <ArrowRight className="w-4 h-4" />
                                         </Button>
                                     </div>
                                 </CardContent>
@@ -135,22 +167,22 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                         </div>
 
                         {/* Recent Activity / Quick Stats Row */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                             {/* Finance Widget */}
                             <Card className="border-slate-200 hover:border-red-200 cursor-pointer transition-colors group" onClick={() => setActiveView('finance')}>
-                                <CardContent className="p-6">
+                                <CardContent className="p-4 sm:p-6">
                                     <div className="flex items-start justify-between">
-                                        <div>
-                                            <p className="text-sm font-medium text-slate-500 mb-1">Budget Consommé</p>
-                                            <h3 className="text-2xl font-bold text-slate-600">
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-xs sm:text-sm font-medium text-slate-500 mb-1">Budget Consommé</p>
+                                            <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-600 truncate">
                                                 {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(finance?.paidAmount || 0)}
                                             </h3>
                                         </div>
                                         <div className="p-2 bg-slate-50 rounded-lg group-hover:bg-red-50 transition-colors">
-                                            <Wallet className="w-5 h-5 text-slate-400 group-hover:text-red-500" />
+                                            <Wallet className="w-4 sm:w-5 h-4 sm:h-5 text-slate-400 group-hover:text-red-500" />
                                         </div>
                                     </div>
-                                    <div className="mt-4 text-xs text-slate-400">
+                                    <div className="mt-3 sm:mt-4 text-xs text-slate-400 truncate">
                                         Sur un total de {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(finance?.totalAmount || 0)}
                                     </div>
                                 </CardContent>
@@ -158,33 +190,33 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
 
                             {/* Documents Widget */}
                             <Card className="border-slate-200 hover:border-blue-200 cursor-pointer transition-colors group" onClick={() => setActiveView('documents')}>
-                                <CardContent className="p-6">
+                                <CardContent className="p-4 sm:p-6">
                                     <div className="flex items-start justify-between">
                                         <div>
-                                            <p className="text-sm font-medium text-slate-500 mb-1">Derniers Documents</p>
-                                            <h3 className="text-2xl font-bold text-slate-600">
+                                            <p className="text-xs sm:text-sm font-medium text-slate-500 mb-1">Derniers Documents</p>
+                                            <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-600">
                                                 {project.documents?.length || 0}
                                             </h3>
                                         </div>
                                         <div className="p-2 bg-slate-50 rounded-lg group-hover:bg-blue-50 transition-colors">
-                                            <FolderOpen className="w-5 h-5 text-slate-400 group-hover:text-blue-500" />
+                                            <FolderOpen className="w-4 sm:w-5 h-4 sm:h-5 text-slate-400 group-hover:text-blue-500" />
                                         </div>
                                     </div>
-                                    <div className="mt-4 text-xs text-slate-400">
+                                    <div className="mt-3 sm:mt-4 text-xs text-slate-400">
                                         Plans, Devis, Factures...
                                     </div>
                                 </CardContent>
                             </Card>
 
                             {/* Contact Widget */}
-                            <Card className="border-slate-200 bg-slate-600 text-white">
-                                <CardContent className="p-6 flex flex-col h-full justify-between">
+                            <Card className="border-slate-200 bg-slate-600 text-white sm:col-span-2 lg:col-span-1">
+                                <CardContent className="p-4 sm:p-6 flex flex-col h-full justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 rounded-full bg-slate-700 flex items-center justify-center font-bold">
+                                        <div className="h-10 w-10 rounded-full bg-slate-700 flex items-center justify-center font-bold shrink-0">
                                             {project.projectManager?.name.charAt(0) || 'CP'}
                                         </div>
-                                        <div>
-                                            <p className="text-sm font-medium opacity-90">{project.projectManager?.name || 'Chef de Projet'}</p>
+                                        <div className="min-w-0">
+                                            <p className="text-xs sm:text-sm font-medium opacity-90 truncate">{project.projectManager?.name || 'Chef de Projet'}</p>
                                             <p className="text-xs opacity-60">Troh Immo</p>
                                         </div>
                                     </div>
@@ -204,39 +236,54 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
         }
     };
 
+
+    const ACTIVE_COLORS = [
+        '#F80000', // Red
+        '#B74CFF', // Purple
+        '#04ADFF', // Blue
+        '#9AFF31', // Green
+        '#FF9C38'  // Orange
+    ];
+
     return (
         <div className="flex h-screen overflow-hidden bg-slate-50/50">
             {/* Sidebar Navigation */}
             <aside className={cn(
-                "fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 flex flex-col",
+                "fixed inset-y-0 left-0 z-50 w-64 sm:w-72 lg:w-64 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 flex flex-col",
                 !isMobileMenuOpen && "-translate-x-full"
             )}>
-                <div className="p-6 flex-1">
-                    <div className="flex items-center gap-2 mb-8 text-red-600 font-bold text-xl">
-                        <Hammer className="w-6 h-6" />
+                <div className="p-4 sm:p-6 flex-1">
+                    <div className="flex items-center gap-2 mb-6 sm:mb-8 text-red-600 font-bold text-lg sm:text-xl">
+                        <Hammer className="w-5 h-5 sm:w-6 sm:h-6" />
                         <span>Espace Client</span>
                     </div>
                     <nav className="space-y-1">
-                        {MENU_ITEMS.map((item) => (
-                            <button
-                                key={item.id}
-                                onClick={() => { setActiveView(item.id as View); setIsMobileMenuOpen(false); }}
-                                className={cn(
-                                    "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
-                                    activeView === item.id
-                                        ? "bg-slate-600 text-white shadow-md shadow-slate-600/20"
-                                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-600"
-                                )}
-                            >
-                                <item.icon className="w-4 h-4" />
-                                {item.label}
-                            </button>
-                        ))}
+                        {MENU_ITEMS.map((item, index) => {
+                            const isActive = activeView === item.id;
+                            const activeColor = ACTIVE_COLORS[index % ACTIVE_COLORS.length];
+
+                            return (
+                                <button
+                                    key={item.id}
+                                    onClick={() => { setActiveView(item.id as View); setIsMobileMenuOpen(false); }}
+                                    className={cn(
+                                        "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
+                                        isActive
+                                            ? "text-white shadow-md shadow-slate-600/20"
+                                            : "text-slate-600 hover:bg-slate-50 hover:text-slate-600"
+                                    )}
+                                    style={isActive ? { backgroundColor: activeColor } : undefined}
+                                >
+                                    <item.icon className={cn("w-4 h-4", isActive ? "text-white" : "")} />
+                                    {item.label}
+                                </button>
+                            )
+                        })}
                     </nav>
                 </div>
 
                 {/* Logout Button */}
-                <div className="p-6 border-t border-slate-100">
+                <div className="p-4 sm:p-6 border-t border-slate-100">
                     <button
                         onClick={onLogout}
                         className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors text-sm font-medium"
@@ -256,14 +303,13 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
             {/* Main Content */}
             <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
                 {/* Mobile Header Trigger */}
-                <div className="lg:hidden p-4 flex items-center gap-4 bg-white border-b border-slate-200">
-                    <Button variant="ghost" className="h-10 w-10 p-0" onClick={() => setIsMobileMenuOpen(true)}>
-                        <Menu className="w-6 h-6" />
+                <div className="lg:hidden p-3 sm:p-4 flex items-center gap-3 sm:gap-4 bg-white border-b border-slate-200">
+                    <Button variant="ghost" className="h-9 w-9 sm:h-10 sm:w-10 p-0" onClick={() => setIsMobileMenuOpen(true)}>
+                        <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
                     </Button>
-                    <span className="font-semibold text-slate-600">Troh Immo</span>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 lg:p-8">
+                <div className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-8">
                     <div className="max-w-6xl mx-auto h-full">
                         {renderContent()}
 

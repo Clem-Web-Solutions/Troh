@@ -43,6 +43,15 @@ const Phase = sequelize.define('Phase', {
         type: DataTypes.TEXT,
         allowNull: true,
     },
+    subtasks: {
+        type: DataTypes.JSON,
+        allowNull: true,
+        defaultValue: [],
+    },
+    category: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
 });
 
 module.exports = Phase;

@@ -5,9 +5,11 @@ import { api } from '../../lib/api';
 
 interface UploadConsoleProps {
     projectId: string;
+    targetFolder?: any;
+    onUploadSuccess?: () => void;
 }
 
-export function UploadConsole({ projectId }: UploadConsoleProps) {
+export function UploadConsole({ projectId, targetFolder, onUploadSuccess }: UploadConsoleProps) {
     const [isDragging, setIsDragging] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [files, setFiles] = useState<FileList | null>(null);
@@ -22,10 +24,14 @@ export function UploadConsole({ projectId }: UploadConsoleProps) {
             formData.append('file', files[0]);
             formData.append('projectId', projectId);
             formData.append('category', category);
+            if (targetFolder) {
+                formData.append('folderId', targetFolder.id);
+            }
 
             await api.uploadDocument(formData);
-            alert('Fichier uploadé avec succès');
+            // alert('Fichier uploadé avec succès'); // Remove alert for smoother flow? Or keep it? keeping it simple for now or using toast if available.
             setFiles(null);
+            if (onUploadSuccess) onUploadSuccess();
         } catch (err) {
             console.error(err);
             alert("Erreur lors de l'upload");
@@ -37,10 +43,17 @@ export function UploadConsole({ projectId }: UploadConsoleProps) {
     return (
         <Card className="h-full flex flex-col min-h-0 shadow-none border-slate-200">
             <CardHeader className="p-3 pb-2">
-                <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-                    <UploadCloud className="w-4 h-4 text-red-600" />
-                    Upload Rapide
+                <CardTitle className="flex items-center justify-between text-sm font-semibold">
+                    <div className="flex items-center gap-2">
+                        <UploadCloud className="w-4 h-4 text-red-600" />
+                        Upload Rapide
+                    </div>
                 </CardTitle>
+                {targetFolder && (
+                    <div className="text-xs text-red-600 bg-red-50 border border-red-100 rounded px-2 py-1 truncate">
+                        Vers : {targetFolder.name}
+                    </div>
+                )}
             </CardHeader>
             <CardContent className="flex-1 flex flex-col gap-2 p-3 pt-0 min-h-0">
                 {/* Drop Zone */}
@@ -86,7 +99,7 @@ export function UploadConsole({ projectId }: UploadConsoleProps) {
 
                 {/* Category Selector */}
                 <div className="grid grid-cols-2 gap-1.5">
-                    {['Plans', 'Photos', 'Factures', 'Admin'].map((cat) => (
+                    {['Plans', 'Photos', 'Factures', 'PV', 'Admin'].map((cat) => (
                         <button
                             key={cat}
                             type="button"

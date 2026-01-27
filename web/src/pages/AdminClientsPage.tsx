@@ -57,33 +57,33 @@ export function AdminClientsPage() {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-600 tracking-tight">Clients</h1>
-                    <p className="text-slate-500 mt-1">Gestion de votre base prospects et clients.</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-600 tracking-tight">Clients</h1>
+                    <p className="text-sm sm:text-base text-slate-500 mt-1">Gestion de votre base prospects et clients.</p>
                 </div>
-                <Button onClick={() => setIsCreateModalOpen(true)} className="gap-2 bg-slate-600 hover:bg-slate-800">
-                    <UserPlus className="w-4 h-4" /> Nouveau Client
+                <Button onClick={() => setIsCreateModalOpen(true)} className="gap-2 bg-slate-600 hover:bg-slate-800 w-full sm:w-auto">
+                    <UserPlus className="w-4 h-4" /> <span className="hidden sm:inline">Nouveau Client</span><span className="sm:hidden">Ajouter</span>
                 </Button>
             </div>
 
             {/* Toolbar */}
-            <Card className="p-4 flex gap-4 items-center">
+            <Card className="p-3 sm:p-4 flex gap-3 sm:gap-4 items-center">
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input
                         type="text"
-                        placeholder="Rechercher un client par nom, email..."
+                        placeholder="Rechercher un client..."
                         className="w-full pl-9 pr-4 py-2 text-sm border-none focus:outline-none"
                     />
                 </div>
             </Card>
 
             {/* Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                 {isLoading ? (
                     <div className="col-span-full flex justify-center p-8"><Loader2 className="animate-spin" /></div>
                 ) : clients.length === 0 ? (

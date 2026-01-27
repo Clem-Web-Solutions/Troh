@@ -72,18 +72,18 @@ export function FinancePage() {
     }
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
 
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col gap-3 sm:gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-600 tracking-tight">Suivi Financier</h1>
-                    <p className="text-slate-500 mt-1">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-600 tracking-tight">Suivi Financier</h1>
+                    <p className="text-sm sm:text-base text-slate-500 mt-1">
                         Vue détaillée pour le projet <span className="font-semibold text-slate-600">{project.name}</span>.
                     </p>
                 </div>
                 {projects.length > 1 && (
-                    <div className="min-w-[200px]">
+                    <div className="w-full sm:w-auto sm:min-w-[200px]">
                         <label className="block text-xs font-medium text-slate-500 mb-1">Changer de projet</label>
                         <select
                             value={selectedProjectId || ''}
@@ -98,9 +98,9 @@ export function FinancePage() {
                 )}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                 {/* Main Summary */}
-                <div className="lg:col-span-2 space-y-8">
+                <div className="lg:col-span-2 space-y-4 sm:space-y-6 lg:space-y-8">
                     <FinanceSummary
                         totalBudget={displayTotal}
                         paidAmount={paidAmount}
@@ -109,38 +109,39 @@ export function FinancePage() {
 
                     {/* Transaction History */}
                     <Card className="overflow-hidden border-slate-200 shadow-sm">
-                        <CardHeader className="border-b border-slate-100 bg-slate-50/50 py-4">
-                            <div className="flex items-center justify-between">
-                                <CardTitle className="text-base font-semibold text-slate-600 flex items-center gap-2">
+                        <CardHeader className="border-b border-slate-100 bg-slate-50/50 py-3 sm:py-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
+                                <CardTitle className="text-sm sm:text-base font-semibold text-slate-600 flex items-center gap-2">
                                     <FileText className="w-4 h-4 text-slate-500" />
-                                    Historique des transactions ({transactions.length})
+                                    <span className="hidden sm:inline">Historique des transactions ({transactions.length})</span>
+                                    <span className="sm:hidden">Transactions ({transactions.length})</span>
                                 </CardTitle>
-                                <Button variant="ghost" size="sm" className="gap-2 text-slate-600 hover:text-slate-600">
-                                    <Download className="w-4 h-4" /> Exporter
+                                <Button variant="ghost" size="sm" className="gap-2 text-slate-600 hover:text-slate-600 text-xs sm:text-sm">
+                                    <Download className="w-3 h-3 sm:w-4 sm:h-4" /> Exporter
                                 </Button>
                             </div>
                         </CardHeader>
                         <div className="divide-y divide-slate-100 bg-white">
                             {transactions.length === 0 ? (
-                                <div className="p-8 text-center text-slate-500 text-sm">Aucune transaction enregistrée.</div>
+                                <div className="p-6 sm:p-8 text-center text-slate-500 text-xs sm:text-sm">Aucune transaction enregistrée.</div>
                             ) : (
                                 transactions.map((tx: any) => (
-                                    <div key={tx.id} className="p-4 flex items-center justify-between hover:bg-slate-50 transition-colors group">
-                                        <div className="flex items-center gap-4">
-                                            <div className={`p-2.5 rounded-full shrink-0 ${tx.type === 'Payment' ? 'bg-red-100 text-red-600' : 'bg-blue-50 text-blue-600'}`}>
-                                                {tx.type === 'Payment' ? <ArrowUpRight className="w-5 h-5" /> : <ArrowDownLeft className="w-5 h-5" />}
+                                    <div key={tx.id} className="p-3 sm:p-4 flex items-center justify-between hover:bg-slate-50 transition-colors group">
+                                        <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
+                                            <div className={`p-1.5 sm:p-2.5 rounded-full shrink-0 ${tx.type === 'Payment' ? 'bg-red-100 text-red-600' : 'bg-blue-50 text-blue-600'}`}>
+                                                {tx.type === 'Payment' ? <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5" /> : <ArrowDownLeft className="w-4 h-4 sm:w-5 sm:h-5" />}
                                             </div>
-                                            <div>
-                                                <p className="font-medium text-slate-600">{tx.description || 'Transaction sans libellé'}</p>
-                                                <p className="text-xs text-slate-500 mt-0.5">
+                                            <div className="min-w-0 flex-1">
+                                                <p className="font-medium text-slate-600 text-xs sm:text-sm truncate">{tx.description || 'Transaction sans libellé'}</p>
+                                                <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5">
                                                     {new Date(tx.date).toLocaleDateString()}
                                                     {tx.status === 'Pending' && <span className="ml-2 text-amber-600 font-medium">En attente</span>}
-                                                    {tx.status === 'Completed' && tx.type === 'Invoice' && <span className="ml-2 text-red-600 font-medium">Payé</span>}
+                                                    {tx.status === 'Completed' && tx.type === 'Invoice' && <span className="ml-2 text-red-600 font-medium hidden sm:inline">Payé</span>}
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="text-right">
-                                            <p className={`font-bold text-sm ${tx.type === 'Payment' ? 'text-red-600' : 'text-slate-600'}`}>
+                                        <div className="text-right shrink-0 ml-2">
+                                            <p className={`font-bold text-xs sm:text-sm ${tx.type === 'Payment' ? 'text-red-600' : 'text-slate-600'}`}>
                                                 {tx.type === 'Payment' ? '-' : '+'} {parseFloat(tx.amount).toLocaleString()} €
                                             </p>
                                         </div>

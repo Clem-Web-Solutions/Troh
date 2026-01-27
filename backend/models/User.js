@@ -15,7 +15,7 @@ const User = sequelize.define('User', {
     email: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
+        unique: 'users_email_unique',
         validate: {
             isEmail: true,
         },
@@ -37,6 +37,13 @@ const User = sequelize.define('User', {
 // Hook to hash password before creation
 User.beforeCreate(async (user) => {
     if (user.password) {
+        user.password = await bcrypt.hash(user.password, 10);
+    }
+});
+
+// Hook to hash password before update
+User.beforeUpdate(async (user) => {
+    if (user.changed('password')) {
         user.password = await bcrypt.hash(user.password, 10);
     }
 });
