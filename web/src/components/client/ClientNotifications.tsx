@@ -1,4 +1,4 @@
-import { Bell, CreditCard, CheckCircle2, FileText, Info } from 'lucide-react';
+import { Bell, CheckCircle2, FileText, Info } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, cn } from '../ui';
 import { useState, useEffect } from 'react';
 import { api } from '../../lib/api';

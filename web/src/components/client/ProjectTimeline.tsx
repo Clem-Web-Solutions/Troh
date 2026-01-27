@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from '../ui';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { CheckCircle2, Circle, Clock, Loader2, ArrowRight, CheckSquare } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, Loader2, CheckSquare } from 'lucide-react';
 
 interface Subtask {
     id: number;
@@ -40,7 +40,6 @@ export function ProjectTimeline({ phases }: ProjectTimelineProps) {
             if (activeIndex > 0) { // If 0, it's already there
                 const cardWidth = 300; // w-[300px]
                 const gap = 24; // gap-6 = 24px
-                const paddingLeft = 24; // px-6 = 24px
 
                 // Calculate position to center it if possible, or just scroll to it
                 // Scroll to start of the card: (width + gap) * index

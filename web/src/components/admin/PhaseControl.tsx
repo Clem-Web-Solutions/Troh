@@ -1,4 +1,4 @@
-import { CheckSquare, MessagesSquare, Plus, Trash2, Loader2, ArrowUp, ArrowDown, FileText, ChevronDown, ChevronRight } from 'lucide-react';
+import { CheckSquare, MessagesSquare, Plus, Loader2, ArrowUp, ArrowDown, ChevronDown, ChevronRight } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Button, cn } from '../ui';
 import { useState, useEffect } from 'react';
 import { api } from '../../lib/api';
@@ -105,20 +105,6 @@ export function PhaseControl({ projectId }: PhaseControlProps) {
         return subtasks.filter((st: Subtask) => st.completed).length;
     };
 
-    const handleToggle = async (phase: any) => {
-        const isCompleted = (phase.status || '').toLowerCase() === 'completed';
-        const newStatus = isCompleted ? 'Pending' : 'Completed';
-        const updatedPhases = phases.map(p => p.id === phase.id ? { ...p, status: newStatus } : p);
-        setPhases(updatedPhases);
-
-        try {
-            await api.updatePhase(phase.id, { status: newStatus });
-        } catch (error) {
-            console.error(error);
-            fetchPhases();
-        }
-    };
-
     const handleMove = async (index: number, direction: 'up' | 'down') => {
         if (direction === 'up' && index === 0) return;
         if (direction === 'down' && index === phases.length - 1) return;
@@ -159,16 +145,6 @@ export function PhaseControl({ projectId }: PhaseControlProps) {
             await api.createPhase(projectId, newPhaseName);
             setNewPhaseName('');
             setIsAdding(false);
-            fetchPhases();
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const handleDelete = async (id: number) => {
-        if (!confirm('Supprimer cette étape ?')) return;
-        try {
-            await api.deletePhase(id);
             fetchPhases();
         } catch (error) {
             console.error(error);

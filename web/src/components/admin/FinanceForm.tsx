@@ -1,5 +1,5 @@
-import { Wallet, PlusCircle, CheckCircle2, Loader2, ArrowUpRight, FileText, Trash2, ArrowDownLeft } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent, Button, Badge } from '../ui';
+import { PlusCircle, CheckCircle2, Loader2, ArrowUpRight, FileText, Trash2, ArrowDownLeft } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardContent, Button } from '../ui';
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../lib/api';
 

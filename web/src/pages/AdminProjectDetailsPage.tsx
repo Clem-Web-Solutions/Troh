@@ -3,7 +3,7 @@ import { ProjectDocuments } from '../components/admin/ProjectDocuments';
 import { PhaseControl } from '../components/admin/PhaseControl';
 import { FinanceForm } from '../components/admin/FinanceForm';
 import { Button, Badge } from '../components/ui';
-import { ArrowLeft, Calendar, User, Building, Loader2 } from 'lucide-react';
+import { ArrowLeft, User, Building, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 
@@ -14,7 +14,6 @@ interface AdminProjectDetailsPageProps {
 
 export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetailsPageProps) {
     const [project, setProject] = useState<any>(null);
-    const [finance, setFinance] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'tasks' | 'documents' | 'finance'>('tasks');
     const [currentFolder, setCurrentFolder] = useState<any | null>(null);
@@ -23,12 +22,11 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [projectData, financeData] = await Promise.all([
+                const [projectData] = await Promise.all([
                     api.getProject(projectId),
                     api.getFinance(projectId).catch(() => null)
                 ]);
                 setProject(projectData);
-                setFinance(financeData);
             } catch (err) {
                 console.error(err);
             } finally {
