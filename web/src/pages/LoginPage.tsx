@@ -40,18 +40,15 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
     return (
         <div className="min-h-screen bg-white flex items-center justify-center p-3 sm:p-4 relative">
-            <img 
-                src="/meereo.png" 
-                alt="Construction worker" 
-                className="absolute left-0 right-0 w-full h-auto max-w-6xl mx-auto hidden sm:block"
+            <img
+                src="/meereo.png"
+                alt="Construction worker"
+                className="absolute left-0 right-0 w-full h-auto max-w-screen-2xl mx-auto hidden sm:block"
                 style={{ zIndex: 0, top: '-50px' }}
             />
-            
-            <div className="absolute bottom-4 sm:bottom-8 left-4 sm:left-8 flex items-center gap-2 sm:gap-4" style={{ zIndex: 10 }}>
-                <img src="/logo_meereo.png" alt="Meereo" className="h-16 sm:h-20 lg:h-28 w-auto" />
-                <img src="/ruzibiza.jpeg" alt="Ruzibiza" className="h-14 sm:h-16 lg:h-24 w-auto" />
-            </div>
-            
+
+
+
             <div className="w-full max-w-md relative" style={{ zIndex: 10 }}>
 
                 <Card className="border-slate-200 shadow-xl">
@@ -110,6 +107,11 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                 <p className="text-center text-sm text-slate-400 mt-4">
                     Pas encore de compte ? Contactez votre administrateur.
                 </p>
+
+                <div className="flex items-center justify-center gap-8 mt-8">
+                    <img src="/logo_meereo.png" alt="Meereo" className="h-32 sm:h-40 w-auto" />
+                    <img src="/ruzibiza.jpeg" alt="Ruzibiza" className="h-28 sm:h-36 w-auto" />
+                </div>
             </div>
         </div>
     );
