@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Card, CardContent, Button } from '../components/ui';
 import { Lock, Mail, Loader2, AlertCircle } from 'lucide-react';
+import { api } from '../lib/api';
 
 interface LoginPageProps {
     onLogin: (user: any, token: string) => void;
@@ -18,18 +19,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
         setError(null);
 
         try {
-            const response = await fetch('http://localhost:5000/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Erreur de connexion');
-            }
-
+            const data = await api.login({ email, password });
             onLogin(data.user, data.token);
         } catch (err: any) {
             setError(err.message);
