@@ -28,13 +28,49 @@ export const api = {
         if (!res.ok) throw new Error('Password change failed');
         return res.json();
     },
+    requestPasswordReset: async (email: string) => {
+        const res = await fetch(`${API_URL}/auth/request-reset`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+        });
+        if (!res.ok) throw new Error('Request failed');
+        return res.json();
+    },
+    verifyResetCode: async (email: string, code: string) => {
+        const res = await fetch(`${API_URL}/auth/verify-code`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, code }),
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Verification failed');
+        }
+        return res.json();
+    },
+    resetPassword: async (data: any) => {
+        const res = await fetch(`${API_URL}/auth/reset-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Reset failed');
+        }
+        return res.json();
+    },
     createClient: async (data: any) => {
         const res = await fetch(`${API_URL}/auth/register`, {
             method: 'POST',
             headers: getHeaders(),
             body: JSON.stringify({ ...data, role: 'client' }),
         });
-        if (!res.ok) throw new Error('Falied to create client');
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Failed to create client');
+        }
         return res.json();
     },
     createAdmin: async (data: any) => {
@@ -43,7 +79,10 @@ export const api = {
             headers: getHeaders(),
             body: JSON.stringify({ ...data, role: 'admin' }),
         });
-        if (!res.ok) throw new Error('Failed to create admin');
+        if (!res.ok) {
+            const error = await res.json();
+            throw new Error(error.message || 'Failed to create admin');
+        }
         return res.json();
     },
     getUsers: async (role?: string) => {

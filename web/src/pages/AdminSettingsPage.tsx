@@ -1,17 +1,42 @@
 import { Card, CardContent, CardHeader, CardTitle, Button } from '../components/ui';
-import { Save, Bell, Lock, Globe } from 'lucide-react';
-
-import { useState } from 'react';
-
+import { Save, Bell, Lock, Globe, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { InviteAdminModal } from '../components/admin/InviteAdminModal';
+import { api } from '../lib/api';
 
 export function AdminSettingsPage() {
     const [activeTab, setActiveTab] = useState<'notifications' | 'security' | 'company'>('notifications');
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+    const [admins, setAdmins] = useState<any[]>([]);
+    const [isLoadingAdmins, setIsLoadingAdmins] = useState(false);
+
+    useEffect(() => {
+        // Get current user email from local storage or decode token (mocking for now or assuming it's stored)
+        // Ideally, we'd have a user context. For now, we'll try to guess or just highlight based on ID if available.
+        // Let's verify if we can get the profile.
+        // For this task, we'll just fetch the list.
+        fetchAdmins();
+    }, []);
+
+    const fetchAdmins = async () => {
+        setIsLoadingAdmins(true);
+        try {
+            const data = await api.getUsers('admin');
+            setAdmins(data);
+        } catch (error) {
+            console.error("Failed to fetch admins", error);
+        } finally {
+            setIsLoadingAdmins(false);
+        }
+    };
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <InviteAdminModal isOpen={isInviteModalOpen} onClose={() => setIsInviteModalOpen(false)} />
+            <InviteAdminModal
+                isOpen={isInviteModalOpen}
+                onClose={() => setIsInviteModalOpen(false)}
+                onSuccess={fetchAdmins}
+            />
 
             {/* Header */}
             <div>
@@ -84,16 +109,30 @@ export function AdminSettingsPage() {
                         <CardContent className="p-6 space-y-6">
                             <div className="space-y-4">
                                 <h3 className="text-sm font-medium text-slate-600">Administrateurs Actifs</h3>
-                                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
-                                    <div className="flex items-center gap-3">
-                                        <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600">A</div>
-                                        <div>
-                                            <p className="text-sm font-medium text-slate-600">Admin Principal</p>
-                                            <p className="text-xs text-slate-500">admin@meereo.com</p>
-                                        </div>
+
+                                {isLoadingAdmins ? (
+                                    <div className="flex justify-center p-4">
+                                        <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
                                     </div>
-                                    <span className="text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded">Moi</span>
-                                </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {admins.map((admin) => (
+                                            <div key={admin.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="h-8 w-8 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600 uppercase">
+                                                        {admin.name.charAt(0)}
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-medium text-slate-600">{admin.name}</p>
+                                                        <p className="text-xs text-slate-500">{admin.email}</p>
+                                                    </div>
+                                                </div>
+                                                {/* <span className="text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded">Admin</span> */}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
                                 <Button
                                     variant="ghost"
                                     className="w-full border border-dashed border-slate-300 text-slate-500 hover:text-slate-600 hover:border-slate-600"

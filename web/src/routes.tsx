@@ -9,7 +9,7 @@ import { ChangePasswordPage } from './pages/ChangePasswordPage';
 
 // Admin Pages
 import { AdminDashboard } from './pages/AdminDashboard';
-import { AdminPanel } from './pages/AdminPanel';
+import { AdminProjectsPage } from './pages/AdminProjectsPage';
 import { AdminProjectDetailsPage } from './pages/AdminProjectDetailsPage';
 import { AdminClientsPage } from './pages/AdminClientsPage';
 import { AdminSettingsPage } from './pages/AdminSettingsPage';
@@ -40,7 +40,7 @@ export function AppRoutes({ currentPath, selectedProjectId, onNavigate, onNaviga
         case 'admin-dashboard':
             return <AdminDashboard />;
         case 'admin-projects':
-            return <AdminPanel onNavigateToProject={onNavigateToProject} />;
+            return <AdminProjectsPage onNavigateToProject={onNavigateToProject} />;
         case 'admin-project-details':
             return <AdminProjectDetailsPage projectId={selectedProjectId!} onBack={() => onNavigate('admin-projects')} />;
         case 'admin-clients':

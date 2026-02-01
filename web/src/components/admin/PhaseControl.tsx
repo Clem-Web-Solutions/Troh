@@ -1,4 +1,4 @@
-import { CheckSquare, MessagesSquare, Plus, Loader2, ArrowUp, ArrowDown, ChevronDown, ChevronRight } from 'lucide-react';
+import { CheckSquare, MessagesSquare, Plus, Loader2, ArrowUp, ArrowDown, ChevronDown, ChevronRight, FileText, Trash2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Button, cn } from '../ui';
 import { useState, useEffect } from 'react';
 import { api } from '../../lib/api';
@@ -7,6 +7,7 @@ interface Subtask {
     id: number;
     name: string;
     completed: boolean;
+    notes?: string;
 }
 
 interface Phase {
@@ -32,10 +33,15 @@ export function PhaseControl({ projectId }: PhaseControlProps) {
     const [isAdding, setIsAdding] = useState(false);
     const [expandedPhases, setExpandedPhases] = useState<Record<number, boolean>>({});
 
+    // State for new subtasks inputs: { [phaseId]: "task name" }
+    const [newSubtasks, setNewSubtasks] = useState<Record<number, string>>({});
+    // State for active note editing: { [phaseId-subtaskIndex]: "note content" }
+    const [editingNote, setEditingNote] = useState<string | null>(null);
+
     const fetchPhases = async () => {
         try {
             const data = await api.getPhases(projectId);
-            
+
             // Parse subtasks if they come as JSON strings
             const parsedData = data.map((phase: any) => {
                 if (phase.subtasks && typeof phase.subtasks === 'string') {
@@ -48,9 +54,9 @@ export function PhaseControl({ projectId }: PhaseControlProps) {
                 }
                 return phase;
             });
-            
+
             setPhases(parsedData);
-            // Expand all phases by default to show subtasks
+            // Expand all phases by default
             const initialExpanded: Record<number, boolean> = {};
             parsedData.forEach((phase: Phase) => {
                 initialExpanded[phase.id] = true;
@@ -74,37 +80,84 @@ export function PhaseControl({ projectId }: PhaseControlProps) {
         }));
     };
 
-    const toggleSubtask = async (phase: Phase, subtaskId: number) => {
+    /**
+     * Fix for "Checking one checks all":
+     * Since subtasks are stored as a JSON array in Postgres/Sequelize, IDs might be duplicated or non-unique in seed data.
+     * We MUST use the array index to identify which subtask to toggle.
+     * We send the entire updated array back to the server, so index-based modification is safe and correct.
+     */
+    const toggleSubtask = async (phase: Phase, subtaskIndex: number) => {
         if (!phase.subtasks || !Array.isArray(phase.subtasks)) return;
 
-        const updatedSubtasks = phase.subtasks.map(st =>
-            st.id === subtaskId ? { ...st, completed: !st.completed } : st
+        const updatedSubtasks = phase.subtasks.map((st, idx) =>
+            idx === subtaskIndex ? { ...st, completed: !st.completed } : st
         );
 
-        // Update local state immediately for responsiveness
-        setPhases(phases.map(p =>
-            p.id === phase.id ? { ...p, subtasks: updatedSubtasks } : p
-        ));
+        // Optimistic UI update
+        updatePhaseLocally(phase.id, { subtasks: updatedSubtasks });
 
         try {
             await api.updatePhase(phase.id, { subtasks: updatedSubtasks });
         } catch (error) {
             console.error('Failed to update subtask:', error);
-            fetchPhases(); // Rollback on error
+            fetchPhases(); // Rollback
         }
     };
 
-    const getCompletionPercentage = (subtasks?: Subtask[] | any) => {
+    const handleAddSubtask = async (e: React.FormEvent, phase: Phase) => {
+        e.preventDefault();
+        const taskName = newSubtasks[phase.id];
+        if (!taskName?.trim()) return;
+
+        const currentSubtasks = phase.subtasks || [];
+        // Generate a pseudo-random ID to avoid immediate collision, though index is verifying logic
+        const newSubtask: Subtask = {
+            id: Date.now(),
+            name: taskName,
+            completed: false
+        };
+
+        const updatedSubtasks = [...currentSubtasks, newSubtask];
+
+        updatePhaseLocally(phase.id, { subtasks: updatedSubtasks });
+        setNewSubtasks(prev => ({ ...prev, [phase.id]: '' }));
+
+        try {
+            await api.updatePhase(phase.id, { subtasks: updatedSubtasks });
+        } catch (error) {
+            console.error("Failed to add subtask", error);
+            fetchPhases();
+        }
+    };
+
+    const updatePhaseLocally = (phaseId: number, updates: Partial<Phase>) => {
+        setPhases(prev => prev.map(p => p.id === phaseId ? { ...p, ...updates } : p));
+    };
+
+    // --- Helpers for Calculations ---
+    const getCompletionPercentage = (subtasks?: Subtask[]) => {
         if (!subtasks || !Array.isArray(subtasks) || subtasks.length === 0) return 0;
-        const completed = subtasks.filter((st: Subtask) => st.completed).length;
+        const completed = subtasks.filter(st => st.completed).length;
         return Math.round((completed / subtasks.length) * 100);
     };
 
-    const getCompletedCount = (subtasks?: Subtask[] | any) => {
-        if (!subtasks || !Array.isArray(subtasks) || subtasks.length === 0) return 0;
-        return subtasks.filter((st: Subtask) => st.completed).length;
+    const getCompletedCount = (subtasks?: Subtask[]) => {
+        if (!subtasks || !Array.isArray(subtasks)) return 0;
+        return subtasks.filter(st => st.completed).length;
     };
 
+    // --- Branding ---
+    // If category is 'Construction' or 'Travaux' -> Meereo Logo
+    // If category is 'Conception', 'Etude', 'Architecture' -> Raw Design Logo
+    const getPhaseLogo = (category?: string) => {
+        const lowerCat = category?.toLowerCase() || '';
+        if (lowerCat.includes('tude') || lowerCat.includes('conception') || lowerCat.includes('archi')) {
+            return "/logo_raw.png"; // Raw Design
+        }
+        return "/logo_meereo.png"; // Meereo default
+    };
+
+    // --- Reordering ---
     const handleMove = async (index: number, direction: 'up' | 'down') => {
         if (direction === 'up' && index === 0) return;
         if (direction === 'down' && index === phases.length - 1) return;
@@ -112,21 +165,14 @@ export function PhaseControl({ projectId }: PhaseControlProps) {
         const newPhases = [...phases];
         const swapIndex = direction === 'up' ? index - 1 : index + 1;
 
-        // Swap locally for UI responsiveness
         [newPhases[index], newPhases[swapIndex]] = [newPhases[swapIndex], newPhases[index]];
-
-        // Assign temp order based on index if 'order' was 0
-        newPhases.forEach((p, i) => p.order = i);
+        newPhases.forEach((p, i) => p.order = i); // Update order
         setPhases(newPhases);
 
         try {
-            // Update both items in backend
-            const p1 = newPhases[index];
-            const p2 = newPhases[swapIndex];
-
             await Promise.all([
-                api.updatePhase(p1.id, { order: p1.order }),
-                api.updatePhase(p2.id, { order: p2.order })
+                api.updatePhase(newPhases[index].id, { order: newPhases[index].order }),
+                api.updatePhase(newPhases[swapIndex].id, { order: newPhases[swapIndex].order })
             ]);
         } catch (error) {
             console.error("Failed to reorder", error);
@@ -134,13 +180,12 @@ export function PhaseControl({ projectId }: PhaseControlProps) {
         }
     };
 
-    const handleAdd = async (e: React.FormEvent) => {
+    const handleAddPhase = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newPhaseName.trim()) {
             setIsAdding(false);
             return;
         }
-
         try {
             await api.createPhase(projectId, newPhaseName);
             setNewPhaseName('');
@@ -152,126 +197,167 @@ export function PhaseControl({ projectId }: PhaseControlProps) {
     };
 
     return (
-        <Card className="h-full flex flex-col">
-            <CardHeader className="p-3 sm:p-4 md:p-6">
-                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                    <CheckSquare className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
-                    Contrôle d'Avancement
+        <Card className="h-full flex flex-col bg-slate-50/50 border-slate-200">
+            <CardHeader className="p-4 bg-white border-b border-slate-100">
+                <CardTitle className="flex items-center gap-2 text-lg text-slate-700">
+                    <CheckSquare className="w-5 h-5 text-sky-600" />
+                    Suivi de Projet
                 </CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 flex flex-col gap-4 sm:gap-6 overflow-hidden p-3 sm:p-4 md:p-6">
-                <div className="flex-1 overflow-y-auto space-y-3 sm:space-y-4 pr-1 sm:pr-2">
+            <CardContent className="flex-1 flex flex-col gap-4 p-4 overflow-hidden">
+                <div className="flex-1 overflow-y-auto space-y-4 pr-1">
                     {isLoading ? (
-                        <div className="flex justify-center"><Loader2 className="animate-spin w-5 h-5 text-slate-400" /></div>
+                        <div className="flex justify-center py-10"><Loader2 className="animate-spin w-8 h-8 text-slate-300" /></div>
                     ) : phases.length === 0 ? (
-                        <div className="text-center text-slate-400 text-xs sm:text-sm py-4">Aucune étape définie.</div>
+                        <div className="text-center text-slate-400 text-sm py-8">Aucune phase définie pour ce projet.</div>
                     ) : (
                         phases.map((phase, index) => {
                             const isExpanded = expandedPhases[phase.id];
-                            const completionPercent = getCompletionPercentage(phase.subtasks);
-                            const completedCount = getCompletedCount(phase.subtasks);
-                            const totalSubtasks = (phase.subtasks && Array.isArray(phase.subtasks)) ? phase.subtasks.length : 0;
-                            const hasSubtasks = totalSubtasks > 0;
+                            const subtasks = phase.subtasks || [];
+                            const completionPercent = getCompletionPercentage(subtasks);
+                            const completedCount = getCompletedCount(subtasks);
+                            const logoSrc = getPhaseLogo(phase.category);
 
                             return (
-                                <div key={phase.id} className="border border-slate-200 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
-                                    {/* Header de la phase */}
-                                    <div className="p-3 sm:p-4">
-                                        <div className="flex items-start gap-3">
-                                            {/* Bouton d'expansion */}
-                                            {hasSubtasks && (
-                                                <button
-                                                    onClick={() => togglePhaseExpansion(phase.id)}
-                                                    className="mt-1 text-slate-400 hover:text-slate-600 transition-colors"
-                                                >
-                                                    {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                                                </button>
-                                            )}
-                                            
-                                            <div className="flex-1 min-w-0">
-                                                {/* Titre et badge de catégorie */}
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    {phase.category && (
-                                                        <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
-                                                            {phase.category}
-                                                        </span>
-                                                    )}
-                                                    <h3 className="text-sm sm:text-base font-semibold text-slate-800 truncate">
-                                                        {phase.name}
-                                                    </h3>
-                                                </div>
-                                                
-                                                {/* Description */}
-                                                {phase.description && (
-                                                    <p className="text-xs sm:text-sm text-slate-600 mb-2">
-                                                        {phase.description}
-                                                    </p>
-                                                )}
-
-                                                {/* Barre de progression */}
-                                                {hasSubtasks && (
-                                                    <div className="mb-2">
-                                                        <div className="flex items-center justify-between text-xs text-slate-600 mb-1">
-                                                            <span>{completedCount}/{totalSubtasks} complétées</span>
-                                                            <span className="font-medium">{completionPercent}%</span>
-                                                        </div>
-                                                        <div className="bg-slate-200 rounded-full h-2 overflow-hidden">
-                                                            <div
-                                                                className="bg-blue-600 h-full transition-all duration-300 ease-out"
-                                                                style={{ width: `${completionPercent}%` }}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                )}
+                                <div key={phase.id} className="group border border-slate-200 rounded-xl bg-white shadow-sm hover:shadow-md transition-all duration-200">
+                                    {/* Phase Header */}
+                                    <div className="p-4">
+                                        <div className="flex items-start gap-4">
+                                            {/* Logo Branding */}
+                                            <div className="w-12 h-12 bg-slate-50 rounded-lg flex items-center justify-center p-1 border border-slate-100 dark:bg-slate-800">
+                                                {/* Fallback to INITIALS if image fails (using simple div for now) */}
+                                                {/* In real app, check if image exists or use a default object-contain */}
+                                                <img
+                                                    src={logoSrc}
+                                                    alt="Logo"
+                                                    className="w-full h-full object-contain opacity-90"
+                                                    onError={(e) => {
+                                                        // Fallback logic could go here
+                                                        e.currentTarget.style.display = 'none';
+                                                    }}
+                                                />
                                             </div>
 
-                                            {/* Actions */}
-                                            <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button
-                                                    onClick={() => handleMove(index, 'up')}
-                                                    disabled={index === 0}
-                                                    className="text-slate-400 hover:text-slate-600 disabled:opacity-30 p-1"
-                                                >
-                                                    <ArrowUp className="w-3 h-3" />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleMove(index, 'down')}
-                                                    disabled={index === phases.length - 1}
-                                                    className="text-slate-400 hover:text-slate-600 disabled:opacity-30 p-1"
-                                                >
-                                                    <ArrowDown className="w-3 h-3" />
-                                                </button>
+                                            <div className="flex-1 min-w-0 pt-1">
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <h3 className="font-bold text-slate-800 truncate text-base">{phase.name}</h3>
+                                                    <button
+                                                        onClick={() => togglePhaseExpansion(phase.id)}
+                                                        className="text-slate-400 hover:text-slate-600 p-1"
+                                                    >
+                                                        {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+                                                    </button>
+                                                </div>
+
+                                                {phase.description && <p className="text-sm text-slate-500 mb-2 line-clamp-2">{phase.description}</p>}
+
+                                                {/* Progress Bar */}
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                                                        <div
+                                                            className={cn("h-full rounded-full transition-all duration-500",
+                                                                completionPercent === 100 ? "bg-green-500" : "bg-sky-500"
+                                                            )}
+                                                            style={{ width: `${completionPercent}%` }}
+                                                        />
+                                                    </div>
+                                                    <span className="text-xs font-medium text-slate-500 min-w-[3rem] text-right">
+                                                        {completedCount}/{subtasks.length}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Liste des sous-tâches (expansible) */}
-                                    {hasSubtasks && isExpanded && phase.subtasks && Array.isArray(phase.subtasks) && (
-                                        <div className="border-t border-slate-100 p-3 sm:p-4 bg-slate-50/50 space-y-2">
-                                            {phase.subtasks.map((subtask) => (
-                                                <label
-                                                    key={subtask.id}
-                                                    className="flex items-center gap-3 p-2 hover:bg-white rounded cursor-pointer transition-colors group"
-                                                >
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={subtask.completed}
-                                                        onChange={() => toggleSubtask(phase, subtask.id)}
-                                                        className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 cursor-pointer"
-                                                    />
-                                                    <span className={cn(
-                                                        "flex-1 text-sm transition-all",
-                                                        subtask.completed
-                                                            ? "line-through text-slate-400"
-                                                            : "text-slate-700 font-medium"
-                                                    )}>
-                                                        {subtask.name}
-                                                    </span>
-                                                    {subtask.completed && (
-                                                        <CheckSquare className="w-4 h-4 text-green-600" />
-                                                    )}
-                                                </label>
-                                            ))}
+                                    {/* Subtasks List */}
+                                    {isExpanded && (
+                                        <div className="border-t border-slate-100 bg-slate-50/30 p-4 pt-2 space-y-2 animate-in slide-in-from-top-2 duration-200">
+
+                                            {/* Add Task Input */}
+                                            <form
+                                                onSubmit={(e) => handleAddSubtask(e, phase)}
+                                                className="flex gap-2 mb-4"
+                                            >
+                                                <input
+                                                    type="text"
+                                                    value={newSubtasks[phase.id] || ''}
+                                                    onChange={(e) => setNewSubtasks(prev => ({ ...prev, [phase.id]: e.target.value }))}
+                                                    placeholder="Ajouter une tâche..."
+                                                    className="flex-1 text-sm bg-white border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-sky-100 focus:border-sky-400 outline-none transition-all"
+                                                />
+                                                <Button type="submit" size="sm" variant="secondary" className="bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">
+                                                    <Plus className="w-4 h-4" />
+                                                </Button>
+                                            </form>
+
+                                            {/* Subtasks */}
+                                            <div className="space-y-2">
+                                                {subtasks.map((subtask, sIdx) => (
+                                                    <div
+                                                        key={`${phase.id}-${sIdx}`} // Using Index for Key to fix duplicate ID bug
+                                                        className="group bg-white border border-slate-100 rounded-lg p-3 hover:border-slate-300 transition-all"
+                                                    >
+                                                        <div className="flex items-start gap-3">
+                                                            <div className="pt-0.5">
+                                                                <input
+                                                                    type="checkbox"
+                                                                    checked={subtask.completed}
+                                                                    onChange={() => toggleSubtask(phase, sIdx)} // Toggle by Index
+                                                                    className="w-4 h-4 text-sky-600 rounded border-slate-300 focus:ring-sky-500 cursor-pointer"
+                                                                />
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <span className={cn(
+                                                                    "block text-sm mb-1 transition-all",
+                                                                    subtask.completed ? "line-through text-slate-400" : "text-slate-700 font-medium"
+                                                                )}>
+                                                                    {subtask.name}
+                                                                </span>
+
+                                                                {/* Notes Section */}
+                                                                <div className="mt-2">
+                                                                    {editingNote === `${phase.id}-${sIdx}` ? (
+                                                                        <div className="flex flex-col gap-2 animate-in fade-in">
+                                                                            <textarea
+                                                                                className="w-full text-xs p-2 border border-slate-200 rounded bg-slate-50 focus:bg-white focus:ring-1 focus:ring-sky-200 outline-none resize-none"
+                                                                                rows={2}
+                                                                                defaultValue={subtask.notes}
+                                                                                onBlur={(e) => {
+                                                                                    // Save note logic
+                                                                                    const note = e.target.value;
+                                                                                    // Update local/backend
+                                                                                    const updated = subtasks.map((st, i) => i === sIdx ? { ...st, notes: note } : st);
+                                                                                    updatePhaseLocally(phase.id, { subtasks: updated });
+                                                                                    api.updatePhase(phase.id, { subtasks: updated });
+                                                                                    setEditingNote(null);
+                                                                                }}
+                                                                                autoFocus
+                                                                            />
+                                                                            <div className="text-[10px] text-slate-400 text-right">Cliquez "hors champ" pour sauvegarder</div>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div
+                                                                            className="flex items-center gap-2 cursor-pointer group/note"
+                                                                            onClick={() => setEditingNote(`${phase.id}-${sIdx}`)}
+                                                                        >
+                                                                            {subtask.notes ? (
+                                                                                <div className="text-xs text-slate-500 bg-amber-50 border border-amber-100 p-2 rounded w-full flex items-start gap-2">
+                                                                                    <FileText className="w-3 h-3 text-amber-400 mt-0.5 shrink-0" />
+                                                                                    {subtask.notes}
+                                                                                </div>
+                                                                            ) : (
+                                                                                <div className="flex items-center gap-1 text-xs text-slate-300 hover:text-slate-500 transition-colors">
+                                                                                    <Plus className="w-3 h-3" /> Ajouter une note
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -280,40 +366,26 @@ export function PhaseControl({ projectId }: PhaseControlProps) {
                     )}
 
                     {isAdding ? (
-                        <form onSubmit={handleAdd} className="flex gap-2">
+                        <form onSubmit={handleAddPhase} className="bg-white p-4 rounded-xl border border-dashed border-slate-300 animate-in fade-in">
                             <input
                                 autoFocus
                                 type="text"
                                 value={newPhaseName}
                                 onChange={(e) => setNewPhaseName(e.target.value)}
-                                className="flex-1 text-sm border-b border-red-500 focus:outline-none py-1"
-                                placeholder="Nom de l'étape..."
+                                className="w-full text-sm border-none focus:ring-0 p-0 placeholder:text-slate-400 font-medium"
+                                placeholder="Nom de la nouvelle phase..."
                                 onBlur={() => { if (!newPhaseName) setIsAdding(false); }}
                             />
-                            <Button type="submit" size="sm" variant="ghost" className="h-7 w-7 p-0 text-red-600"><Plus className="w-4 h-4" /></Button>
                         </form>
                     ) : (
-                        <Button variant="ghost" size="sm" className="w-full text-slate-400 hover:text-red-600 border border-dashed border-slate-200 hover:border-red-200" onClick={() => setIsAdding(true)}>
-                            <Plus className="w-4 h-4 mr-2" /> Ajouter une étape
+                        <Button
+                            variant="ghost"
+                            className="w-full text-slate-400 hover:text-sky-600 hover:bg-sky-50 border border-dashed border-slate-200 hover:border-sky-200 h-12"
+                            onClick={() => setIsAdding(true)}
+                        >
+                            <Plus className="w-5 h-5 mr-2" /> Nouvelle Phase
                         </Button>
                     )}
-                </div>
-
-                <div className="pt-4 border-t border-slate-100 mt-auto">
-                    <div className="flex items-center gap-2 text-slate-600 font-medium mb-3">
-                        <MessagesSquare className="w-4 h-4" />
-                        <span>Mises à jour Client</span>
-                    </div>
-                    <div className="space-y-3">
-                        {/* Placeholder for updates */}
-                        <div className="text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-100 italic">
-                            "Les matériaux pour la toiture ont été livrés ce matin. Début de pose prévu demain."
-                            <div className="text-right mt-1 font-semibold not-italic text-slate-400">10:42</div>
-                        </div>
-                        <Button variant="secondary" size="sm" className="w-full gap-2">
-                            <Plus className="w-4 h-4" /> Ajouter une note
-                        </Button>
-                    </div>
                 </div>
             </CardContent>
         </Card>

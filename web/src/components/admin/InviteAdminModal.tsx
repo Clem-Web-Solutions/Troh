@@ -6,9 +6,10 @@ import { api } from '../../lib/api';
 interface InviteAdminModalProps {
     isOpen: boolean;
     onClose: () => void;
+    onSuccess?: () => void;
 }
 
-export function InviteAdminModal({ isOpen, onClose }: InviteAdminModalProps) {
+export function InviteAdminModal({ isOpen, onClose, onSuccess }: InviteAdminModalProps) {
     const [email, setEmail] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -40,6 +41,9 @@ export function InviteAdminModal({ isOpen, onClose }: InviteAdminModalProps) {
     };
 
     const handleClose = () => {
+        if (tempPassword && onSuccess) {
+            onSuccess();
+        }
         setTempPassword(null);
         setEmail('');
         setFirstName('');

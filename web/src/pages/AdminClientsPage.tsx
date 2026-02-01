@@ -1,11 +1,18 @@
 import { Card, Button, Badge } from '../components/ui';
-import { Search, Mail, Phone, MoreHorizontal, UserPlus, Loader2 } from 'lucide-react';
+import { Search, Mail, Phone, UserPlus, Loader2 } from 'lucide-react';
 import { CreateClientModal } from '../components/admin/CreateClientModal';
+import { ConfirmationModal } from '../components/ui/ConfirmationModal';
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 
 export function AdminClientsPage() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+    // Delete Confirmation State
+    const [clientToDelete, setClientToDelete] = useState<number | null>(null);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
     const [clients, setClients] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -14,13 +21,11 @@ export function AdminClientsPage() {
         try {
             const data = await api.getClients();
             // Transform data if needed or backend returns flat User objects
-            // Adding mock stats for projects count/status since User model might not have it aggregated yet
-            // In a real app, we'd include count in query.
             const clientsWithStats = data.map((c: any) => ({
                 ...c,
-                projects: 0, // Placeholder
-                status: 'active', // Placeholder
-                phone: 'N/A' // Placeholder if not in DB
+                projects: 0,
+                status: 'active',
+                phone: c.phone || 'N/A' // Use actual phone or fallback
             }));
             setClients(clientsWithStats);
         } catch (error) {
@@ -44,15 +49,25 @@ export function AdminClientsPage() {
         }
     };
 
-    const handleDeleteClient = async (clientId: number) => {
-        if (window.confirm('Êtes-vous sûr de vouloir supprimer ce client ? Cette action est irréversible.')) {
-            try {
-                await api.deleteClient(clientId);
-                fetchClients();
-            } catch (error) {
-                console.error(error);
-                alert('Erreur lors de la suppression du client.');
-            }
+    const confirmDeleteClient = (clientId: number) => {
+        setClientToDelete(clientId);
+        setIsDeleteModalOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!clientToDelete) return;
+
+        setIsDeleting(true);
+        try {
+            await api.deleteClient(clientToDelete);
+            fetchClients();
+            setIsDeleteModalOpen(false);
+            setClientToDelete(null);
+        } catch (error) {
+            console.error(error);
+            alert('Erreur lors de la suppression du client.');
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -101,12 +116,10 @@ export function AdminClientsPage() {
                                         className="h-8 w-8 p-0 text-red-500 hover:bg-red-50 hover:text-red-700"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            handleDeleteClient(client.id);
+                                            confirmDeleteClient(client.id);
                                         }}
                                         title="Supprimer le client"
                                     >
-                                        <MoreHorizontal className="w-4 h-4 rotate-90" /> {/* Using rotate-90 merely as a placeholder for trash icon or keep distinct */}
-                                        {/* Ideally replace MoreHorizontal with Trash2 if available or just use Trash2 */}
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-trash-2"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg>
                                     </Button>
                                 </div>
@@ -136,6 +149,17 @@ export function AdminClientsPage() {
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
                 onSubmit={handleCreateClient}
+            />
+
+            <ConfirmationModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleConfirmDelete}
+                title="Supprimer le client ?"
+                message="Êtes-vous sûr de vouloir supprimer ce client ? Cette action est irréversible et supprimera toutes les données associées."
+                confirmText="Oui, supprimer"
+                variant="danger"
+                isLoading={isDeleting}
             />
 
         </div>

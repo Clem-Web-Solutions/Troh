@@ -1,0 +1,5 @@
+From: "Troh Immo" <contact@meereocockpit.com>
+To: "Test" <contact@meereocockpit.com>
+Subject: Test CURL SMTP
+
+Ceci est un test de connexion SMTP via CURL.
