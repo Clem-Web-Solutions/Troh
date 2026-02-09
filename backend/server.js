@@ -39,6 +39,9 @@ app.use('/api/finances', financeRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/phases', require('./routes/phases'));
 app.use('/api/activities', require('./routes/activities'));
+app.use('/api/tasks', require('./routes/tasks'));
+app.use('/api/amendments', require('./routes/amendments'));
+app.use('/api/reserves', require('./routes/reserves'));
 
 // Serve uploads
 app.use('/uploads', express.static('uploads'));

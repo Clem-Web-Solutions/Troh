@@ -1,4 +1,4 @@
-import { CheckSquare, MessagesSquare, Plus, Loader2, ArrowUp, ArrowDown, ChevronDown, ChevronRight, FileText, Trash2 } from 'lucide-react';
+import { CheckSquare, Plus, Loader2, ChevronDown, ChevronRight, FileText } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, Button, cn } from '../ui';
 import { useState, useEffect } from 'react';
 import { api } from '../../lib/api';
@@ -24,9 +24,11 @@ interface Phase {
 
 interface PhaseControlProps {
     projectId: string;
+    title?: string;
+    className?: string;
 }
 
-export function PhaseControl({ projectId }: PhaseControlProps) {
+export function PhaseControl({ projectId, title = "Suivi de Projet", className }: PhaseControlProps) {
     const [phases, setPhases] = useState<Phase[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [newPhaseName, setNewPhaseName] = useState('');
@@ -197,11 +199,11 @@ export function PhaseControl({ projectId }: PhaseControlProps) {
     };
 
     return (
-        <Card className="h-full flex flex-col bg-slate-50/50 border-slate-200">
+        <Card className={cn("h-full flex flex-col bg-slate-50/50 border-slate-200", className)}>
             <CardHeader className="p-4 bg-white border-b border-slate-100">
                 <CardTitle className="flex items-center gap-2 text-lg text-slate-700">
                     <CheckSquare className="w-5 h-5 text-sky-600" />
-                    Suivi de Projet
+                    {title}
                 </CardTitle>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col gap-4 p-4 overflow-hidden">

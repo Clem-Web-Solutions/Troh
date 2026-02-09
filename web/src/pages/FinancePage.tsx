@@ -32,8 +32,13 @@ export function FinancePage() {
 
         const fetchFinance = async () => {
             try {
-                const financeData = await api.getFinance(selectedProjectId.toString());
-                setFinance(financeData);
+                // Fetch milestones using the new endpoint
+                const paymentsRes = await fetch(`/api/projects/${selectedProjectId}/payments`);
+                const paymentsData = await paymentsRes.json();
+
+                // Keep existing finance fetch for backwards compat if needed, or merge
+                // The new endpoint returns { total_budget, milestones }
+                setFinance(paymentsData);
             } catch (error) {
                 console.error("Failed to load finance", error);
             }
@@ -107,47 +112,49 @@ export function FinancePage() {
                         totalLabel={displayLabel}
                     />
 
-                    {/* Transaction History */}
+                    {/* Milestones / Tranches (Ultimate Prompt) */}
                     <Card className="overflow-hidden border-slate-200 shadow-sm">
                         <CardHeader className="border-b border-slate-100 bg-slate-50/50 py-3 sm:py-4">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-0">
-                                <CardTitle className="text-sm sm:text-base font-semibold text-slate-600 flex items-center gap-2">
-                                    <FileText className="w-4 h-4 text-slate-500" />
-                                    <span className="hidden sm:inline">Historique des transactions ({transactions.length})</span>
-                                    <span className="sm:hidden">Transactions ({transactions.length})</span>
-                                </CardTitle>
-                                <Button variant="ghost" size="sm" className="gap-2 text-slate-600 hover:text-slate-600 text-xs sm:text-sm">
-                                    <Download className="w-3 h-3 sm:w-4 sm:h-4" /> Exporter
-                                </Button>
-                            </div>
+                            <CardTitle className="text-sm sm:text-base font-semibold text-slate-600 flex items-center gap-2">
+                                <FileText className="w-4 h-4 text-slate-500" />
+                                <span className="hidden sm:inline">Échéancier des Paiements</span>
+                                <span className="sm:hidden">Paiements</span>
+                            </CardTitle>
                         </CardHeader>
-                        <div className="divide-y divide-slate-100 bg-white">
-                            {transactions.length === 0 ? (
-                                <div className="p-6 sm:p-8 text-center text-slate-500 text-xs sm:text-sm">Aucune transaction enregistrée.</div>
-                            ) : (
-                                transactions.map((tx: any) => (
-                                    <div key={tx.id} className="p-3 sm:p-4 flex items-center justify-between hover:bg-slate-50 transition-colors group">
-                                        <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
-                                            <div className={`p-1.5 sm:p-2.5 rounded-full shrink-0 ${tx.type === 'Payment' ? 'bg-red-100 text-red-600' : 'bg-blue-50 text-blue-600'}`}>
-                                                {tx.type === 'Payment' ? <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5" /> : <ArrowDownLeft className="w-4 h-4 sm:w-5 sm:h-5" />}
-                                            </div>
-                                            <div className="min-w-0 flex-1">
-                                                <p className="font-medium text-slate-600 text-xs sm:text-sm truncate">{tx.description || 'Transaction sans libellé'}</p>
-                                                <p className="text-[10px] sm:text-xs text-slate-500 mt-0.5">
-                                                    {new Date(tx.date).toLocaleDateString()}
-                                                    {tx.status === 'Pending' && <span className="ml-2 text-amber-600 font-medium">En attente</span>}
-                                                    {tx.status === 'Completed' && tx.type === 'Invoice' && <span className="ml-2 text-red-600 font-medium hidden sm:inline">Payé</span>}
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right shrink-0 ml-2">
-                                            <p className={`font-bold text-xs sm:text-sm ${tx.type === 'Payment' ? 'text-red-600' : 'text-slate-600'}`}>
-                                                {tx.type === 'Payment' ? '-' : '+'} {parseFloat(tx.amount).toLocaleString()} €
-                                            </p>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
+                        <div className="bg-white p-0">
+                            <table className="w-full text-left text-sm">
+                                <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-100">
+                                    <tr>
+                                        <th className="p-4">Tranche</th>
+                                        <th className="p-4">Montant</th>
+                                        <th className="p-4">Statut</th>
+                                        <th className="p-4">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100">
+                                    {finance?.milestones?.map((m: any) => (
+                                        <tr key={m.milestone_id} className="hover:bg-slate-50">
+                                            <td className="p-4 font-medium text-slate-700">{m.label}</td>
+                                            <td className="p-4 text-slate-600">{((project.budget || 50000) * m.percentage / 100).toLocaleString()} €</td>
+                                            <td className="p-4">
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
+                                                    ${m.status === 'paid' ? 'bg-green-100 text-green-800' :
+                                                        m.status === 'invoiced' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-800'}`}>
+                                                    {m.status}
+                                                </span>
+                                            </td>
+                                            <td className="p-4">
+                                                {/* Action buttons could go here */}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {(!finance?.milestones || finance.milestones.length === 0) && (
+                                        <tr>
+                                            <td colSpan={4} className="p-4 text-center text-slate-500">Aucune tranche définie.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
                         </div>
                     </Card>
                 </div>

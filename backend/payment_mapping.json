@@ -1,0 +1,60 @@
+{
+    "RAW_DESIGN": {
+      "PH-01": {
+        "label": "Honoraires conception",
+        "payment_type": "forfait_or_percentage",
+        "milestones": [
+          {
+            "code": "RD-P1",
+            "label": "À la commande",
+            "percentage": 30,
+            "condition": null
+          },
+          {
+            "code": "RD-P2",
+            "label": "Validation APS",
+            "percentage": 30,
+            "condition": "Task T-01 approved"
+          },
+          {
+            "code": "RD-P3",
+            "label": "Dépôt Permis",
+            "percentage": 40,
+            "condition": "Permis déposé"
+          }
+        ]
+      }
+    },
+    "MEEREO_PROJECT": {
+      "PH-03": {
+        "label": "Paiements travaux",
+        "payment_type": "situations",
+        "milestones": [
+          {
+            "code": "MP-P1",
+            "label": "Acompte démarrage",
+            "percentage": 30,
+            "condition": "Contrat signé"
+          },
+          {
+            "code": "MP-P2",
+            "label": "Avancement 50%",
+            "percentage": 30,
+            "condition": "Validation Chef de Projet"
+          },
+          {
+            "code": "MP-P3",
+            "label": "Fin travaux",
+            "percentage": 30,
+            "condition": "PV Réception signé"
+          },
+          {
+            "code": "MP-P4",
+            "label": "Levée des réserves",
+            "percentage": 10,
+            "condition": "All reserves resolved"
+          }
+        ]
+      }
+    }
+  }

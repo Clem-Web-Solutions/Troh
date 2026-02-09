@@ -2,56 +2,43 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const Phase = sequelize.define('Phase', {
-    id: {
-        type: DataTypes.INTEGER,
-        autoIncrement: true,
+    phase_id: {
+        type: DataTypes.STRING(50),
         primaryKey: true,
+        allowNull: false,
     },
-    projectId: {
-        type: DataTypes.INTEGER,
+    project_id: {
+        type: DataTypes.STRING(50),
         allowNull: false,
         references: {
-            model: 'Projects',
-            key: 'id',
+            model: 'projects',
+            key: 'project_id',
         },
     },
-    name: {
-        type: DataTypes.STRING,
+    etape: {
+        type: DataTypes.STRING(100),
         allowNull: false,
     },
-    status: {
-        type: DataTypes.ENUM('pending', 'active', 'completed'),
+    statut: {
+        type: DataTypes.ENUM('pending', 'active', 'completed', 'blocked'),
         defaultValue: 'pending',
     },
-    startDate: {
+    date_debut: {
         type: DataTypes.DATEONLY,
         allowNull: true,
     },
-    endDate: {
+    date_fin: {
         type: DataTypes.DATEONLY,
         allowNull: true,
     },
-    comments: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-    },
-    order: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-    },
-    description: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-    },
-    subtasks: {
-        type: DataTypes.JSON,
-        allowNull: true,
-        defaultValue: [],
-    },
-    category: {
+    // Compat fields
+    name: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: true
     },
+}, {
+    tableName: 'project_phases',
+    timestamps: false
 });
 
 module.exports = Phase;

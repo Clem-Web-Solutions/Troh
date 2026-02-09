@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui';
 import { Users, Briefcase, Activity, FileText, CheckCircle2 } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 
@@ -113,6 +113,41 @@ export function AdminDashboard() {
                                     />
                                     <Area type="monotone" dataKey="count" stroke="#FF9C38" strokeWidth={2} fillOpacity={1} fill="url(#colorCount)" />
                                 </AreaChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Payment Distribution Chart (Ultimate Prompt) */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="text-base sm:text-lg">Répartition Financière</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="h-[250px] sm:h-[300px] w-full flex justify-center items-center">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={[
+                                            { name: 'Payé', value: 45000 },
+                                            { name: 'En attente', value: 25000 },
+                                            { name: 'Reste', value: 30000 },
+                                        ]}
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        fill="#8884d8"
+                                        paddingAngle={5}
+                                        dataKey="value"
+                                    >
+                                        <Cell fill="#22c55e" /> {/* Paid */}
+                                        <Cell fill="#f59e0b" /> {/* Pending */}
+                                        <Cell fill="#94a3b8" /> {/* Main/Rest */}
+                                    </Pie>
+                                    <Tooltip />
+                                    <Legend verticalAlign="bottom" height={36} />
+                                </PieChart>
                             </ResponsiveContainer>
                         </div>
                     </CardContent>

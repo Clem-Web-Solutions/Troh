@@ -2,43 +2,50 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const Document = sequelize.define('Document', {
-    id: {
+    document_id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
     },
-    projectId: {
-        type: DataTypes.INTEGER,
+    project_id: {
+        type: DataTypes.STRING(50),
         allowNull: false,
         references: {
-            model: 'Projects',
-            key: 'id',
-        },
-    },
-    folderId: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        references: {
-            model: 'Folders',
-            key: 'id',
+            model: 'projects',
+            key: 'project_id',
         },
     },
     name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(255),
         allowNull: false,
     },
+    type: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+    },
     category: {
-        type: DataTypes.ENUM('Plans', 'Administratif', 'Financier', 'Technique', 'Photos', 'PV', 'Autre'),
+        type: DataTypes.ENUM('Plan', 'Facture', 'Contrat', 'Autre'),
         defaultValue: 'Autre',
     },
     url: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(255),
         allowNull: false,
     },
-    uploadDate: {
+    version: {
+        type: DataTypes.INTEGER,
+        defaultValue: 1,
+    },
+    uploaded_at: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
     },
+    uploaded_by: {
+        type: DataTypes.INTEGER, // User ID reference
+        allowNull: true,
+    }
+}, {
+    tableName: 'documents',
+    timestamps: false
 });
 
 module.exports = Document;
