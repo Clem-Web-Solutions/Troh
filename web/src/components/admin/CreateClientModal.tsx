@@ -1,4 +1,4 @@
-import { X, User, Mail, Phone, MapPin, Building, Globe } from 'lucide-react';
+import { X, User, Mail, MapPin, Building, Globe } from 'lucide-react';
 import { Button } from '../ui';
 import { useState, useEffect } from 'react';
 

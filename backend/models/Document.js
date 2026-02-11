@@ -2,17 +2,25 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const Document = sequelize.define('Document', {
-    document_id: {
+    id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
     },
-    project_id: {
-        type: DataTypes.STRING(50),
+    projectId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'projects',
-            key: 'project_id',
+            model: 'Projects', // Matches Folder.js
+            key: 'id',
+        },
+    },
+    folderId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: 'Folders',
+            key: 'id',
         },
     },
     name: {

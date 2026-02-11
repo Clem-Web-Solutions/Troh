@@ -2,24 +2,24 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const PhaseTask = sequelize.define('PhaseTask', {
-    task_id: {
-        type: DataTypes.STRING(50),
+    id: {
+        type: DataTypes.INTEGER,
         primaryKey: true,
-        allowNull: false,
+        autoIncrement: true,
     },
-    phase_id: {
-        type: DataTypes.STRING(50),
+    phaseId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'project_phases',
-            key: 'phase_id',
+            model: 'Phases',
+            key: 'id',
         },
     },
-    libellé: {
+    name: {
         type: DataTypes.STRING(255),
         allowNull: false,
     },
-    statut: {
+    status: {
         type: DataTypes.ENUM('todo', 'in_progress', 'done'),
         defaultValue: 'todo',
     },
@@ -28,8 +28,8 @@ const PhaseTask = sequelize.define('PhaseTask', {
         defaultValue: null,
     }
 }, {
-    tableName: 'phase_tasks',
-    timestamps: false
+    tableName: 'PhaseTasks',
+    timestamps: true
 });
 
 module.exports = PhaseTask;

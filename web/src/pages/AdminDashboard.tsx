@@ -8,16 +8,20 @@ export function AdminDashboard() {
     const [stats, setStats] = useState<any[]>([]);
     const [activities, setActivities] = useState<any[]>([]);
     const [projectCount, setProjectCount] = useState<string>('-');
+    const [monthlyRevenue, setMonthlyRevenue] = useState<string>('-');
     const [clientCount, setClientCount] = useState<string>('-');
+    const [financeStats, setFinanceStats] = useState<{ paid: number, pending: number, remaining: number }>({ paid: 0, pending: 0, remaining: 0 });
 
     useEffect(() => {
         const loadDashboardData = async () => {
             try {
-                const [recentActivities, activityStats, projects, clients] = await Promise.all([
+                const [recentActivities, activityStats, projects, clients, revenueData, globalFinance] = await Promise.all([
                     api.getRecentActivities(),
                     api.getActivityStats(),
                     api.getProjects(),
-                    api.getClients()
+                    api.getClients(),
+                    api.getMonthlyRevenue(),
+                    api.getGlobalFinanceStats()
                 ]);
 
                 setActivities(recentActivities);
@@ -27,6 +31,8 @@ export function AdminDashboard() {
                 })));
                 setProjectCount(projects.length.toString());
                 setClientCount(clients.length.toString());
+                setMonthlyRevenue(`${revenueData.revenue} €`);
+                setFinanceStats(globalFinance);
 
             } catch (error) {
                 console.error("Dashboard data load failed", error);
@@ -56,6 +62,16 @@ export function AdminDashboard() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-sm font-medium text-slate-500">CA du Mois</CardTitle>
+                        <span className="text-xl font-bold text-green-600">€</span>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-slate-600">{monthlyRevenue}</div>
+                        <p className="text-xs text-slate-500 mt-1">Revenu ce mois</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium text-slate-500">Projets Actifs</CardTitle>
                         <Briefcase className="w-4 h-4 text-red-600" />
                     </CardHeader>
@@ -64,7 +80,6 @@ export function AdminDashboard() {
                         <p className="text-xs text-slate-500 mt-1">Total Projets</p>
                     </CardContent>
                 </Card>
-                {/* Other cards remain simple placeholders for now as requested or can be wired similarly if more data endpoints existed */}
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-medium text-slate-500">Clients</CardTitle>
@@ -129,9 +144,9 @@ export function AdminDashboard() {
                                 <PieChart>
                                     <Pie
                                         data={[
-                                            { name: 'Payé', value: 45000 },
-                                            { name: 'En attente', value: 25000 },
-                                            { name: 'Reste', value: 30000 },
+                                            { name: 'Payé', value: financeStats.paid },
+                                            { name: 'En attente', value: financeStats.pending },
+                                            { name: 'Reste', value: financeStats.remaining },
                                         ]}
                                         cx="50%"
                                         cy="50%"
@@ -145,7 +160,7 @@ export function AdminDashboard() {
                                         <Cell fill="#f59e0b" /> {/* Pending */}
                                         <Cell fill="#94a3b8" /> {/* Main/Rest */}
                                     </Pie>
-                                    <Tooltip />
+                                    <Tooltip formatter={(value: number | undefined) => `${(value || 0).toLocaleString()} €`} />
                                     <Legend verticalAlign="bottom" height={36} />
                                 </PieChart>
                             </ResponsiveContainer>

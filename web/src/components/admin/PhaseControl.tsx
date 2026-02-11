@@ -26,9 +26,14 @@ interface PhaseControlProps {
     projectId: string;
     title?: string;
     className?: string;
+    category?: string;
+    onUpdate?: () => void;
 }
 
-export function PhaseControl({ projectId, title = "Suivi de Projet", className }: PhaseControlProps) {
+export function PhaseControl({ projectId, title = "Suivi de Projet", className, category, onUpdate }: PhaseControlProps) {
+    // ... (existing state)
+
+
     const [phases, setPhases] = useState<Phase[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [newPhaseName, setNewPhaseName] = useState('');
@@ -57,7 +62,7 @@ export function PhaseControl({ projectId, title = "Suivi de Projet", className }
                 return phase;
             });
 
-            setPhases(parsedData);
+            setPhases(parsedData.filter((p: any) => !category || p.category === category || (category === 'DESIGN' && !p.category))); // Fallback for old phases without category
             // Expand all phases by default
             const initialExpanded: Record<number, boolean> = {};
             parsedData.forEach((phase: Phase) => {
@@ -73,7 +78,7 @@ export function PhaseControl({ projectId, title = "Suivi de Projet", className }
 
     useEffect(() => {
         fetchPhases();
-    }, [projectId]);
+    }, [projectId, category]);
 
     const togglePhaseExpansion = (phaseId: number) => {
         setExpandedPhases(prev => ({
@@ -100,6 +105,8 @@ export function PhaseControl({ projectId, title = "Suivi de Projet", className }
 
         try {
             await api.updatePhase(phase.id, { subtasks: updatedSubtasks });
+            await fetchPhases(); // Sync real IDs from backend
+            if (onUpdate) onUpdate(); // Notify parent
         } catch (error) {
             console.error('Failed to update subtask:', error);
             fetchPhases(); // Rollback
@@ -126,6 +133,8 @@ export function PhaseControl({ projectId, title = "Suivi de Projet", className }
 
         try {
             await api.updatePhase(phase.id, { subtasks: updatedSubtasks });
+            await fetchPhases(); // Sync real IDs
+            if (onUpdate) onUpdate();
         } catch (error) {
             console.error("Failed to add subtask", error);
             fetchPhases();
@@ -160,27 +169,7 @@ export function PhaseControl({ projectId, title = "Suivi de Projet", className }
     };
 
     // --- Reordering ---
-    const handleMove = async (index: number, direction: 'up' | 'down') => {
-        if (direction === 'up' && index === 0) return;
-        if (direction === 'down' && index === phases.length - 1) return;
 
-        const newPhases = [...phases];
-        const swapIndex = direction === 'up' ? index - 1 : index + 1;
-
-        [newPhases[index], newPhases[swapIndex]] = [newPhases[swapIndex], newPhases[index]];
-        newPhases.forEach((p, i) => p.order = i); // Update order
-        setPhases(newPhases);
-
-        try {
-            await Promise.all([
-                api.updatePhase(newPhases[index].id, { order: newPhases[index].order }),
-                api.updatePhase(newPhases[swapIndex].id, { order: newPhases[swapIndex].order })
-            ]);
-        } catch (error) {
-            console.error("Failed to reorder", error);
-            fetchPhases();
-        }
-    };
 
     const handleAddPhase = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -193,6 +182,7 @@ export function PhaseControl({ projectId, title = "Suivi de Projet", className }
             setNewPhaseName('');
             setIsAdding(false);
             fetchPhases();
+            if (onUpdate) onUpdate();
         } catch (error) {
             console.error(error);
         }
@@ -213,7 +203,7 @@ export function PhaseControl({ projectId, title = "Suivi de Projet", className }
                     ) : phases.length === 0 ? (
                         <div className="text-center text-slate-400 text-sm py-8">Aucune phase définie pour ce projet.</div>
                     ) : (
-                        phases.map((phase, index) => {
+                        phases.map((phase) => {
                             const isExpanded = expandedPhases[phase.id];
                             const subtasks = phase.subtasks || [];
                             const completionPercent = getCompletionPercentage(subtasks);
@@ -226,7 +216,8 @@ export function PhaseControl({ projectId, title = "Suivi de Projet", className }
                                     <div className="p-4">
                                         <div className="flex items-start gap-4">
                                             {/* Logo Branding */}
-                                            <div className="w-12 h-12 bg-slate-50 rounded-lg flex items-center justify-center p-1 border border-slate-100 dark:bg-slate-800">
+                                            {/* Logo Branding - Force white bg for visibility of dark logos */}
+                                            <div className="w-12 h-12 bg-white shadow-sm rounded-lg flex items-center justify-center p-1 border border-slate-100">
                                                 {/* Fallback to INITIALS if image fails (using simple div for now) */}
                                                 {/* In real app, check if image exists or use a default object-contain */}
                                                 <img

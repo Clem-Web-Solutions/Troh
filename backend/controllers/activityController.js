@@ -18,6 +18,10 @@ exports.logActivity = async (type, description, projectId, userId) => {
 // Get recent activities for notifications
 exports.getRecentActivities = async (req, res) => {
     try {
+        if (!req.user) {
+            console.error('ActivityController: req.user is undefined!');
+            return res.status(500).json({ message: 'Internal Auth Error' });
+        }
         const { role, id } = req.user;
         let whereClause = {};
 
@@ -39,6 +43,7 @@ exports.getRecentActivities = async (req, res) => {
         });
         res.json(activities);
     } catch (error) {
+        console.error('Error fetching activities:', error); // Added logging
         res.status(500).json({ message: 'Error fetching activities', error: error.message });
     }
 };

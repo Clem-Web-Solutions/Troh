@@ -1,4 +1,4 @@
-const { Phase, Project, Activity } = require('../models');
+const { Phase, Project, Activity, PhaseTask } = require('../models');
 
 // Get all phases for a project
 exports.getPhases = async (req, res) => {
@@ -6,10 +6,27 @@ exports.getPhases = async (req, res) => {
         const { projectId } = req.params;
         const phases = await Phase.findAll({
             where: { projectId },
-            order: [['order', 'ASC'], ['id', 'ASC']]
+            include: [{ model: PhaseTask, as: 'tasks' }],
+            order: [['order', 'ASC'], ['id', 'ASC'], [{ model: PhaseTask, as: 'tasks' }, 'id', 'ASC']]
         });
-        res.json(phases);
+
+        // Format for frontend
+        const formattedPhases = phases.map(p => {
+            const json = p.toJSON();
+            // Map PhaseTasks to subtasks format expected by frontend
+            json.subtasks = (json.tasks || []).map(t => ({
+                id: t.id,
+                name: t.name,
+                completed: t.status === 'done',
+                notes: t.approval_status === 'rejected' ? 'Rejected' : '' // or store notes elsewhere?
+            }));
+            delete json.tasks; // Clean up
+            return json;
+        });
+
+        res.json(formattedPhases);
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: 'Error fetching phases', error: error.message });
     }
 };
@@ -44,7 +61,7 @@ exports.updatePhase = async (req, res) => {
             return res.status(404).json({ message: 'Phase not found' });
         }
 
-        phase.status = status || phase.status;
+        if (status) phase.status = status;
 
         // Allow manual date updates for planning
         if (req.body.startDate) phase.startDate = req.body.startDate;
@@ -65,22 +82,77 @@ exports.updatePhase = async (req, res) => {
             phase.description = req.body.description;
         }
 
-        if (req.body.subtasks !== undefined) {
-            phase.subtasks = req.body.subtasks;
-        }
-
         await phase.save();
 
-        // Recalculate Project Progress
-        const allPhases = await Phase.findAll({ where: { projectId: phase.projectId } });
-        const totalPhases = allPhases.length;
-        const completedPhases = allPhases.filter(p => p.status === 'Completed').length;
-        const progress = totalPhases > 0 ? Math.round((completedPhases / totalPhases) * 100) : 0;
+        // Handle Subtasks Sync
+        if (req.body.subtasks && Array.isArray(req.body.subtasks)) {
+            const incomingTasks = req.body.subtasks;
 
-        // Determine Project Status
+            // Get existing tasks for this phase
+            const existingTasks = await PhaseTask.findAll({ where: { phaseId: phase.id } });
+            const existingTaskIds = new Set(existingTasks.map(t => t.id));
+            const incomingTaskIds = new Set(incomingTasks.filter(t => t.id && typeof t.id === 'number').map(t => t.id));
+
+            // Delete tasks not in the incoming list
+            for (const existingTask of existingTasks) {
+                if (!incomingTaskIds.has(existingTask.id)) {
+                    await existingTask.destroy();
+                }
+            }
+
+            for (const task of incomingTasks) {
+                const isNew = typeof task.id === 'string' || task.id > 1000000000000; // Heuristic for Date.now() ID
+
+                if (isNew) {
+                    // Create new
+                    await PhaseTask.create({
+                        phaseId: phase.id,
+                        name: task.name,
+                        status: task.completed ? 'done' : 'todo'
+                    });
+                } else {
+                    // Update existing
+                    const existingTask = await PhaseTask.findByPk(task.id);
+                    if (existingTask) {
+                        existingTask.name = task.name;
+                        existingTask.status = task.completed ? 'done' : 'todo';
+                        await existingTask.save();
+                    }
+                }
+            }
+        }
+
+        // Recalculate Project Progress based on TASKS
+        const allPhases = await Phase.findAll({
+            where: { projectId: phase.projectId },
+            include: [{ model: PhaseTask, as: 'tasks' }]
+        });
+
+        let totalTasks = 0;
+        let completedTasks = 0;
+
+        allPhases.forEach(p => {
+            if (p.tasks) {
+                p.tasks.forEach(t => {
+                    totalTasks++;
+                    if (t.status === 'done') completedTasks++;
+                });
+            }
+        });
+
+        const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+        // Determine Project Status (Must match DB ENUM: Etude, Chantier, Livré, Suspendu)
         let projectStatus = 'Etude';
+        // If progress started but not finished -> Chantier (In Progress)
         if (progress > 0 && progress < 100) projectStatus = 'Chantier';
-        if (progress === 100) projectStatus = 'Completed'; // Or 'Livré'
+        // If finished -> Livré (Delivered/Completed)
+        if (progress === 100) projectStatus = 'Livré';
+
+        // Override if "Chantier" is detected via other means? 
+        // Keep existing logic if user prefers specific statuses, but "En cours" matches the badge logic.
+        // Actually the prompt said "l'état du projet soit évoluer".
+        // Let's keep it simple.
 
         await Project.update(
             { progress, status: projectStatus },
@@ -96,8 +168,19 @@ exports.updatePhase = async (req, res) => {
             });
         }
 
-        res.json({ ...phase.toJSON(), progress, projectStatus }); // Return updated info if needed
+        // Return updated phase with refreshed tasks
+        const updatedPhase = await Phase.findByPk(id, { include: [{ model: PhaseTask, as: 'tasks' }] });
+        const json = updatedPhase.toJSON();
+        json.subtasks = (json.tasks || []).map(t => ({
+            id: t.id,
+            name: t.name,
+            completed: t.status === 'done',
+        }));
+        delete json.tasks;
+
+        res.json({ ...json, progress, projectStatus });
     } catch (error) {
+        console.error('Error updating phase:', error);
         res.status(500).json({ message: 'Error updating phase', error: error.message });
     }
 };

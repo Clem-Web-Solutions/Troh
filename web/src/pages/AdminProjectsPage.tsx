@@ -1,7 +1,7 @@
 import { ProjectTable } from '../components/admin/ProjectTable';
 import { CreateProjectModal } from '../components/admin/CreateProjectModal';
 import { Plus, Loader2, Calendar, Filter } from 'lucide-react';
-import { Button, Card } from '../components/ui';
+import { Button, Card, ConfirmationModal } from '../components/ui';
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 
@@ -15,6 +15,7 @@ export function AdminProjectsPage({ onNavigateToProject }: AdminProjectsPageProp
     const [filteredProjects, setFilteredProjects] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [projectToDelete, setProjectToDelete] = useState<number | null>(null);
 
     // Filter state: "YYYY-MM" string or "ALL"
     const [selectedMonth, setSelectedMonth] = useState<string>("ALL");
@@ -41,7 +42,7 @@ export function AdminProjectsPage({ onNavigateToProject }: AdminProjectsPageProp
             setFilteredProjects(projects);
         } else {
             const filtered = projects.filter(project => {
-                const date = new Date(project.createdAt); // Filtering by Creation Date
+                const date = new Date(project.date_creation); // Filtering by Creation Date
                 const monthStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
                 return monthStr === selectedMonth;
             });
@@ -54,7 +55,13 @@ export function AdminProjectsPage({ onNavigateToProject }: AdminProjectsPageProp
             await api.createProject({
                 name: projectData.name,
                 address: projectData.address,
-                clientId: projectData.client,
+                client_id: projectData.client,
+                entité: projectData.entité,
+                chef_projet: projectData.projectManagerId,
+                budget: projectData.budget,
+                currency: projectData.currency,
+                estimated_start_date: projectData.startDate,
+                projectTypeId: projectData.projectTypeId,
                 status: 'Etude'
             });
             setIsCreateModalOpen(false);
@@ -64,21 +71,25 @@ export function AdminProjectsPage({ onNavigateToProject }: AdminProjectsPageProp
         }
     };
 
-    const handleDeleteProject = async (projectId: number) => {
-        if (window.confirm('Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible.')) {
-            try {
-                await api.deleteProject(projectId);
-                fetchProjects();
-            } catch (err: any) {
-                console.error(err);
-                alert('Erreur lors de la suppression du projet.');
-            }
+    const handleDeleteClick = (projectId: number) => {
+        setProjectToDelete(projectId);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!projectToDelete) return;
+        try {
+            await api.deleteProject(projectToDelete);
+            setProjectToDelete(null);
+            fetchProjects();
+        } catch (err: any) {
+            console.error(err);
+            alert('Erreur lors de la suppression du projet.');
         }
     };
 
     // Generate Month Options from available projects
     const monthOptions = Array.from(new Set(projects.map(p => {
-        const date = new Date(p.createdAt);
+        const date = new Date(p.date_creation);
         return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
     }))).sort().reverse(); // Newest months first
 
@@ -147,7 +158,7 @@ export function AdminProjectsPage({ onNavigateToProject }: AdminProjectsPageProp
                             <ProjectTable
                                 projects={filteredProjects}
                                 onSelectProject={(id: string) => onNavigateToProject && onNavigateToProject(id)}
-                                onDelete={handleDeleteProject}
+                                onDelete={handleDeleteClick}
                             />
                         ) : (
                             <div className="text-center py-12 bg-slate-50/50 rounded-xl border-2 border-dashed border-slate-200">
@@ -162,6 +173,16 @@ export function AdminProjectsPage({ onNavigateToProject }: AdminProjectsPageProp
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
                 onSubmit={handleCreateProject}
+            />
+
+            <ConfirmationModal
+                isOpen={!!projectToDelete}
+                onClose={() => setProjectToDelete(null)}
+                onConfirm={handleConfirmDelete}
+                title="Supprimer le projet"
+                message="Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible et supprimera toutes les données associées."
+                confirmText="Supprimer"
+                variant="danger"
             />
 
         </div>

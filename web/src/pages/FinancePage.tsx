@@ -1,6 +1,6 @@
 import { FinanceSummary } from '../components/client/FinanceSummary';
-import { Card, CardHeader, CardTitle, Button } from '../components/ui';
-import { Download, ArrowUpRight, ArrowDownLeft, Loader2, FileText } from 'lucide-react';
+import { Card, CardHeader, CardTitle } from '../components/ui';
+import { Loader2, FileText } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 

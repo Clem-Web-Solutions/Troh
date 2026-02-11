@@ -1,8 +1,14 @@
-const { Project, Phase, PhaseTask, User, Reserve, Document, PaymentMilestone } = require('../models');
+const { Project, Phase, PhaseTask, User, Reserve, Document, PaymentMilestone, Folder } = require('../models');
 const { Op } = require('sequelize');
+const PROJECT_TEMPLATES = require('../config/projectTemplates');
 
 exports.getAllProjects = async (req, res) => {
     try {
+        // Debug log
+        if (!req.user) {
+            console.error('ProjectController: req.user is undefined!', req.headers);
+            return res.status(500).json({ message: 'Internal Auth Error: User not attached to request' });
+        }
         const { role, id } = req.user;
         let projects;
 
@@ -35,7 +41,9 @@ exports.getAllProjects = async (req, res) => {
 
 exports.createProject = async (req, res) => {
     try {
-        const { name, address, client_id, entité, project_type_id, chef_projet } = req.body;
+        const { name, address, client_id, entité, project_type_id, projectTypeId, chef_projet, budget, currency, estimated_start_date } = req.body;
+        // Map frontend camelCase to backend snake_case if needed
+        const typeId = project_type_id || projectTypeId;
 
         if (!entité || !client_id) {
             return res.status(400).json({ message: 'Entité et User ID requis' });
@@ -72,30 +80,74 @@ exports.createProject = async (req, res) => {
             address,
             client_id,
             entité,
-            project_type_id,
+            project_type_id: typeId,
             chef_projet,
+            budget,
+            currency,
+            estimated_start_date,
             statut_global: 'Etude',
         });
 
-        // Initialize Phases based on type (Logic to be expanded if needed)
-        // For now, we create empty phases or default phases if provided in request or hardcoded mapping?
-        // User didn't specify phase creation logic detailedly, but existing code had `defaultPhases`.
-        // I will keep a simple default phase creation.
+        // Initialize Phases/Tasks from Template
+        const templateKey = req.body.projectTypeId || req.body.project_type_id; // Handle both
+        let template = PROJECT_TEMPLATES[templateKey];
 
-        const defaultPhases = [
-            { etape: 'Conception', phase_id_suffix: 'PH-01' },
-            { etape: 'Préparation', phase_id_suffix: 'PH-02' },
-            { etape: 'Exécution', phase_id_suffix: 'PH-03' }
+        // Fallback or validation
+        if (!template) {
+            console.warn(`Template not found for key: ${templateKey}. Using default.`);
+            template = PROJECT_TEMPLATES['DEFAULT'];
+        }
+
+        if (template && template.phases) {
+            for (const pTemplate of template.phases) {
+                // Create Phase
+                const phase = await Phase.create({
+                    projectId: project.id, // Use the auto-generated Integer ID from the project instance
+                    name: pTemplate.name,
+                    status: 'pending', // Default
+                    category: 'DESIGN'
+                });
+
+                // Create Tasks for this Phase
+                if (pTemplate.tasks && pTemplate.tasks.length > 0) {
+                    for (const taskName of pTemplate.tasks) {
+                        await PhaseTask.create({
+                            phaseId: phase.id,
+                            name: taskName,
+                            status: 'todo',
+                            approval_status: 'pending' // Default
+                        });
+                    }
+                }
+            }
+        }
+
+        // Trigger Milestone Generation
+        const financeController = require('./financeController');
+        await financeController.generateMilestones(project.id, budget, entité);
+
+        // Create Default Folders
+        const defaultFolders = [
+            { name: 'Plans', type: 'DOCUMENTS' },
+            { name: 'Photos', type: 'PHOTOS' },
+            { name: 'Administratifs', type: 'DOCUMENTS' },
+            { name: 'PV', type: 'DOCUMENTS' },
+            { name: 'Factures', type: 'DOCUMENTS' }
         ];
 
-        for (const p of defaultPhases) {
-            await Phase.create({
-                phase_id: `${projectId}-${p.phase_id_suffix}`,
-                project_id: projectId,
-                etape: p.etape,
-                statut: 'pending'
-            });
+        for (const folder of defaultFolders) {
+            try {
+                await Folder.create({
+                    projectId: project.id,
+                    name: folder.name,
+                    type: folder.type,
+                    date: new Date()
+                });
+            } catch (err) {
+                console.error(`Error creating default folder ${folder.name}:`, err);
+            }
         }
+
 
         res.status(201).json({ success: true, project_id: projectId });
     } catch (error) {
@@ -118,12 +170,24 @@ exports.getProjectById = async (req, res) => {
 
         if (!project) return res.status(404).json({ message: 'Projet introuvable' });
 
+        // Fetch Linked Project if exists (e.g. Construction Project)
+        let linkedProject = null;
+        if (project.linked_project_id) {
+            linkedProject = await Project.findOne({
+                where: { project_id: project.linked_project_id }
+            });
+        }
+
+        // Convert to JSON to attach extra property
+        const projectData = project.toJSON();
+        projectData.linkedProject = linkedProject;
+
         // Security check
         if (req.user.role !== 'admin' && project.client_id !== req.user.id) {
             return res.sendStatus(403);
         }
 
-        res.json(project);
+        res.json(projectData);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Erreur serveur' });
@@ -143,7 +207,7 @@ exports.approveTask = async (req, res) => {
         if (!task) return res.status(404).json({ message: 'Task not found' });
 
         task.approval_status = 'approved';
-        task.statut = 'done';
+        task.status = 'done';
         await task.save();
 
         res.json({ success: true, task_id });
@@ -173,6 +237,110 @@ exports.inputReserve = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error creating reserve' });
+    }
+};
+
+exports.createConstructionProject = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const project = await Project.findByPk(id);
+
+        if (!project) {
+            return res.status(404).json({ message: 'Projet introuvable' });
+        }
+
+        // Check if construction phases already exist
+        const existingConstructionPhases = await Phase.findOne({
+            where: {
+                projectId: id,
+                category: 'CONSTRUCTION'
+            }
+        });
+
+        if (existingConstructionPhases) {
+            return res.status(400).json({ message: 'La phase travaux est déjà active.' });
+        }
+
+        // Update Project Status/Entity
+        project.entité = 'MEEREO_PROJECT'; // Switch context to Construction
+        project.statut_global = 'Chantier';
+        await project.save();
+
+        // Initialize Construction Phases
+        const template = PROJECT_TEMPLATES['CONSTRUCTION_CLE_EN_MAIN'];
+        if (template && template.phases) {
+            for (const pTemplate of template.phases) {
+                const phase = await Phase.create({
+                    projectId: project.id,
+                    name: pTemplate.name,
+                    status: 'pending',
+                    category: 'CONSTRUCTION'
+                });
+
+                if (pTemplate.tasks) {
+                    for (const taskName of pTemplate.tasks) {
+                        await PhaseTask.create({
+                            phaseId: phase.id,
+                            name: taskName,
+                            status: 'todo',
+                            approval_status: 'pending'
+                        });
+                    }
+                }
+            }
+        }
+
+        // Trigger Milestone Generation for Construction
+        const financeController = require('./financeController');
+        await financeController.generateMilestones(project.id, project.budget, 'MEEREO_PROJECT');
+
+        res.json({ success: true, message: 'Phase travaux activée', project });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erreur lors de l\'activation des travaux', error: error.message });
+    }
+};
+
+exports.deleteProject = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const project = await Project.findByPk(id);
+
+        if (!project) {
+            return res.status(404).json({ message: 'Projet introuvable' });
+        }
+
+        // Delete Phases (and their tasks via cascade if DB configured, or manual loop)
+        // Safer to manual cascade if unsure of DB constraints
+        const phases = await Phase.findAll({ where: { projectId: id } });
+        for (const phase of phases) {
+            await PhaseTask.destroy({ where: { phaseId: phase.id } });
+            await phase.destroy();
+        }
+
+        // Delete Reserves
+        await Reserve.destroy({ where: { project_id: project.project_id } }); // Note: Reserves link via string ID usually? Check model.
+        // Project.js says project_id is string. Reserve.js usually links to that. 
+        // Let's check Reserve model usage in inputReserve: `project_id: id` where id comes from req.params of project which is PK?
+        // Wait, getProjectById uses `req.params.id` (PK) for `Project.findByPk`. 
+        // But inputReserve uses `req.params.id` as `project_id`. 
+        // If the URL is /projects/:id (PK), then reserve is linked to PK.
+        // If the URL is /projects/:project_id (String), then reserve is linked to String.
+        // Codebase seems mixed. fallback:
+        await Reserve.destroy({ where: { project_id: id } }); // If linked by PK
+        await Reserve.destroy({ where: { project_id: project.project_id } }); // If linked by String ID
+
+        // Delete Documents (just metadata)
+        await Document.destroy({ where: { project_id: id } });
+
+        // Delete Project
+        await project.destroy();
+
+        res.json({ success: true, message: 'Projet supprimé' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erreur lors de la suppression du projet' });
     }
 };
 

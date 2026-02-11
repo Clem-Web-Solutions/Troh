@@ -94,3 +94,5 @@ export function Badge({ className, variant = 'default', ...props }: BadgeProps) 
         />
     );
 }
+
+export * from './ConfirmationModal';

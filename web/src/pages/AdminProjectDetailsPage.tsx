@@ -1,8 +1,8 @@
-import { UploadConsole } from '../components/admin/UploadConsole';
+
 import { ProjectDocuments } from '../components/admin/ProjectDocuments';
 import { PhaseControl } from '../components/admin/PhaseControl';
 import { FinanceForm } from '../components/admin/FinanceForm';
-import { Button, Badge } from '../components/ui';
+import { Button, Badge, ConfirmationModal } from '../components/ui';
 import { ArrowLeft, User, Building, Loader2, AlertTriangle, Plus } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
@@ -21,28 +21,51 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
     const [project, setProject] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'tasks' | 'documents' | 'finance' | 'reserves' | 'amendments'>('tasks');
-    const [currentFolder, setCurrentFolder] = useState<any | null>(null);
-    const [documentsRefreshKey, setDocumentsRefreshKey] = useState(0);
+
+    const [documentsRefreshKey] = useState(0);
+    const [projectRefreshKey, setProjectRefreshKey] = useState(0);
     const [reserves, setReserves] = useState<any[]>([]);
     const [amendments, setAmendments] = useState<any[]>([]);
+    const [isConstructionModalOpen, setIsConstructionModalOpen] = useState(false);
 
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [projectData] = await Promise.all([
+                const [projectData, financeData] = await Promise.all([
                     api.getProject(projectId),
-                    api.getFinance(projectId).catch(() => null),
-                    // Fetch reserves/amendments if endpoints exist
-                    fetch(`/api/projects/${projectId}/reserves`).then(res => res.json()).catch(() => []),
-                    fetch(`/api/projects/${projectId}/amendments`).then(res => res.json()).catch(() => []) // Assuming endpoint or mocking
+                    api.getFinance(projectId).catch(() => null)
                 ]);
+
                 setProject(projectData);
-                // Ideally promise.all returns array, I should destructure correctly
-                // But simplified:
-                // Let's re-fetch specifically
-                fetch(`/api/projects/${projectId}/reserves`).then(r => r.json()).then(setReserves).catch(console.error);
-                // fetch(`/api/projects/${projectId}/amendments`).then(r=>r.json()).then(setAmendments).catch(console.error); // Implement if endpoint exists in project routes (I added it to routes/projects.js in previous turn)
+
+                if (financeData) {
+                    // Start: Extract reserves and amendments if available in financeData (Project include)
+                    // Note: getFinance returns { total_budget, milestones }. 
+                    // Wait, getFinance controller:
+                    /*
+                    const project = await Project.findByPk(id, {
+                        include: [
+                            { model: Amendment, as: 'amendments' },
+                            { model: Reserve, as: 'reserves' },
+                            ...
+                        ]
+                    });
+                    ...
+                    res.json({
+                        total_budget: currentTotal,
+                        milestones: enrichedMilestones,
+                        // It DOES NOT return amendments/reserves directly in the JSON response currently!
+                        // I need to update financeController to return them OR create the routes.
+                        // Updating financeController is cleaner.
+                        amendments: project.amendments,
+                        reserves: project.reserves
+                    });
+                    */
+                    // For now, I'll update the controller to return these lists so frontend can use them.
+                    setReserves(financeData.reserves || []);
+                    setAmendments(financeData.amendments || []);
+                }
 
             } catch (err) {
                 console.error(err);
@@ -51,11 +74,9 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
             }
         };
         fetchData();
-    }, [projectId]);
+    }, [projectId, projectRefreshKey]);
 
-    const handleUploadSuccess = () => {
-        setDocumentsRefreshKey(prev => prev + 1);
-    };
+
 
     if (isLoading) return <div className="flex justify-center p-20"><Loader2 className="animate-spin" /></div>;
     if (!project) return <div>Projet non trouvé</div>;
@@ -85,7 +106,40 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
                         <div className="min-w-0 w-full sm:w-auto">
                             <div className="flex items-center gap-2 sm:gap-3 mb-2 flex-wrap">
                                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-600 tracking-tight truncate">{PROJECT.name}</h1>
-                                <Badge variant="success">En cours</Badge>
+                                {(() => {
+                                    // Calculate Task Progress Frontend-side for immediate feedback
+                                    let totalTasks = 0;
+                                    let completedTasks = 0;
+
+                                    if (project.phases) {
+                                        project.phases.forEach((phase: any) => {
+                                            if (phase.tasks) {
+                                                phase.tasks.forEach((task: any) => {
+                                                    totalTasks++;
+                                                    if (task.status === 'done') completedTasks++;
+                                                });
+                                            }
+                                        });
+                                    }
+
+                                    const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+                                    // Determine Badge Variant based on valid options: default, success, warning, neutral
+                                    let badgeVariant: "default" | "success" | "warning" | "neutral" = "neutral";
+                                    let statusText = "Démarrage";
+
+                                    if (progress === 100) {
+                                        badgeVariant = "success";
+                                        statusText = "Terminé";
+                                    } else if (progress > 0) {
+                                        badgeVariant = "default";
+                                        statusText = `En cours (${progress}%)`;
+                                    }
+
+                                    return (
+                                        <Badge variant={badgeVariant}>{statusText}</Badge>
+                                    );
+                                })()}
                             </div>
                             <div className="flex items-center gap-3 sm:gap-6 text-slate-500 text-xs sm:text-sm flex-wrap">
                                 <div className="flex items-center gap-2">
@@ -143,20 +197,32 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
             <div className="flex-1 min-h-0 bg-slate-50/50 rounded-xl p-1">
                 {activeTab === 'tasks' && (
                     <div className="h-full max-w-4xl mx-auto space-y-8 pb-10">
-                        {/* Map Architecture */}
+/* Map Architecture */
                         <PhaseControl
                             projectId={projectId}
                             title="Phase 1 : Études & Conception (Architecte)"
+                            category="DESIGN"
+                            onUpdate={() => setProjectRefreshKey(k => k + 1)}
                         />
 
                         {/* Map Construction (Conditional) */}
-                        {project.linked_project_id ? (
+                        {/* We check if project has construction context or simply show the control which will be empty/hidden if no phases? 
+                            Better to show the "Activate" block if no construction phases exist. 
+                            We can't easily check phases count here without fetching them. 
+                            However, PhaseControl fetches them. 
+                            Let's rely on a callback or simple check. 
+                            Actually, we can check project.entité or statut_global.
+                         */}
+                        {project.entité === 'MEEREO_PROJECT' || project.statut_global === 'Chantier' ? (
                             <PhaseControl
-                                projectId={project.linked_project_id}
+                                projectId={projectId}
                                 title="Phase 2 : Travaux & Réalisation (Construction)"
                                 className="border-l-4 border-l-green-500"
+                                category="CONSTRUCTION"
+                                onUpdate={() => setProjectRefreshKey(k => k + 1)}
                             />
                         ) : (
+                            // ... inside return ...
                             project.entité === 'RAW_DESIGN' && (
                                 <div className="bg-white p-8 rounded-xl border border-dashed border-slate-300 text-center animate-in fade-in">
                                     <AlertTriangle className="w-10 h-10 text-amber-500 mx-auto mb-3" />
@@ -166,17 +232,29 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
                                     </p>
                                     <Button
                                         variant="primary"
-                                        onClick={() => {
-                                            if (confirm("Valider le dossier et activer la phase travaux ?")) {
-                                                // Ideally call API to create linked project
-                                                console.log("Validation triggered - API implementation needed");
-                                                alert("Simulation : Phase travaux activée ! (Nécessite implémentation backend)");
-                                            }
-                                        }}
+                                        onClick={() => setIsConstructionModalOpen(true)}
                                         className="bg-green-600 hover:bg-green-700 text-white"
                                     >
                                         Valider le dossier & Lancer les Travaux
                                     </Button>
+
+                                    <ConfirmationModal
+                                        isOpen={isConstructionModalOpen}
+                                        onClose={() => setIsConstructionModalOpen(false)}
+                                        onConfirm={async () => {
+                                            try {
+                                                await api.createConstructionProject(projectId);
+                                                window.location.reload();
+                                            } catch (e: any) {
+                                                console.error(e);
+                                                // Alert removed, maybe use toast? For now console.
+                                            }
+                                        }}
+                                        title="Lancer la phase travaux ?"
+                                        message="Cette action va activer la phase chantiers sur ce projet. Confirmez-vous la validation du dossier administratif ?"
+                                        confirmText="Valider & Lancer"
+                                        variant="warning"
+                                    />
                                 </div>
                             )
                         )}
@@ -184,21 +262,11 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
                 )}
 
                 {activeTab === 'documents' && (
-                    <div className="h-full max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-                        <div className="lg:col-span-2 h-full min-h-[400px] sm:min-h-[500px]">
-                            <ProjectDocuments
-                                projectId={projectId}
-                                onFolderChange={setCurrentFolder}
-                                refreshKey={documentsRefreshKey}
-                            />
-                        </div>
-                        <div className="h-[200px] sm:h-[240px] lg:h-auto">
-                            <UploadConsole
-                                projectId={projectId}
-                                targetFolder={currentFolder}
-                                onUploadSuccess={handleUploadSuccess}
-                            />
-                        </div>
+                    <div className="h-full max-w-5xl mx-auto">
+                        <ProjectDocuments
+                            projectId={projectId}
+                            refreshKey={documentsRefreshKey}
+                        />
                     </div>
                 )}
 

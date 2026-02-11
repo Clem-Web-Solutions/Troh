@@ -103,6 +103,15 @@ export const api = {
         if (!res.ok) throw new Error('Failed to delete client');
         return res.json();
     },
+    updateUser: async (id: number, data: any) => {
+        const res = await fetch(`${API_URL}/users/${id}`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Failed to update user');
+        return res.json();
+    },
 
     // Projects
     getProjects: async () => {
@@ -116,6 +125,18 @@ export const api = {
             headers: getHeaders()
         });
         if (!res.ok) throw new Error('Failed to delete project');
+        return res.json();
+    },
+
+    createConstructionProject: async (sourceProjectId: string | number) => {
+        const res = await fetch(`${API_URL}/projects/${sourceProjectId}/create-construction`, {
+            method: 'POST',
+            headers: getHeaders(),
+        });
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || 'Erreur lors de la création du projet travaux');
+        }
         return res.json();
     },
     getProject: async (id: string) => {
@@ -132,6 +153,8 @@ export const api = {
         if (!res.ok) throw new Error('Failed to create project');
         return res.json();
     },
+
+
 
     // Folders
     createFolder: async (data: { projectId: string | number, name: string, date?: string, type?: 'DOCUMENTS' | 'PHOTOS' }) => {
@@ -177,6 +200,14 @@ export const api = {
         if (!res.ok) throw new Error('Upload failed');
         return res.json();
     },
+    deleteDocument: async (id: number) => {
+        const res = await fetch(`${API_URL}/documents/${id}`, {
+            method: 'DELETE',
+            headers: getHeaders()
+        });
+        if (!res.ok) throw new Error('Failed to delete document');
+        return res.json();
+    },
 
     // Finances
     getFinance: async (projectId: string) => {
@@ -193,6 +224,15 @@ export const api = {
         });
         if (!response.ok) throw new Error('Failed to add transaction');
         return response.json();
+    },
+    updateTransaction: async (id: number, data: any) => {
+        const res = await fetch(`${API_URL}/finances/transaction/${id}`, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Failed to update transaction');
+        return res.json();
     },
     deleteTransaction: async (id: number) => {
         const res = await fetch(`${API_URL}/finances/transaction/${id}`, {
@@ -245,6 +285,16 @@ export const api = {
     getActivityStats: async () => {
         const res = await fetch(`${API_URL}/activities/stats`, { headers: getHeaders() });
         if (!res.ok) throw new Error('Failed to fetch stats');
+        return res.json();
+    },
+    getMonthlyRevenue: async () => {
+        const res = await fetch(`${API_URL}/finances/monthly-revenue`, { headers: getHeaders() });
+        if (!res.ok) throw new Error('Failed to fetch monthly revenue');
+        return res.json();
+    },
+    getGlobalFinanceStats: async () => {
+        const res = await fetch(`${API_URL}/finances/global-stats`, { headers: getHeaders() });
+        if (!res.ok) throw new Error('Failed to fetch global finance stats');
         return res.json();
     }
 };

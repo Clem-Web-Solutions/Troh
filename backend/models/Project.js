@@ -2,10 +2,15 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const Project = sequelize.define('Project', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    },
     project_id: {
         type: DataTypes.STRING(50),
-        primaryKey: true,
         allowNull: false,
+        // unique: true, // Make unique to allow FK references
     },
     // Keep 'id' for compatibility if needed, or mapped? 
     // Sequelize uses the PK field name. We'll use project_id.
@@ -21,12 +26,22 @@ const Project = sequelize.define('Project', {
     },
     entité: {
         type: DataTypes.ENUM('RAW_DESIGN', 'MEEREO_PROJECT'),
-        allowNull: false,
+        defaultValue: 'RAW_DESIGN'
     },
     project_type_id: {
-        type: DataTypes.STRING(50),
-        allowNull: true,
+        type: DataTypes.STRING,
+        allowNull: true
     },
+    // Standardizing status field to match DB schema (ENUM)
+    status: {
+        type: DataTypes.ENUM('Etude', 'Chantier', 'Livré', 'Suspendu'),
+        defaultValue: 'Etude',
+    },
+    progress: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+    },
+    // New fields
     statut_global: {
         type: DataTypes.ENUM('Etude', 'Chantier', 'Livré', 'Suspendu', 'Annulé'),
         defaultValue: 'Etude',
@@ -51,6 +66,19 @@ const Project = sequelize.define('Project', {
     },
     address: {
         type: DataTypes.STRING,
+        allowNull: true,
+    },
+    budget: {
+        type: DataTypes.DECIMAL(15, 2),
+        allowNull: true,
+    },
+    currency: {
+        type: DataTypes.STRING(10), // CFA, EUR, USD, CHF
+        defaultValue: 'XOF',
+        allowNull: true,
+    },
+    estimated_start_date: {
+        type: DataTypes.DATEONLY,
         allowNull: true,
     }
 }, {

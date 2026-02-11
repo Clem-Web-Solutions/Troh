@@ -2,10 +2,15 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const PaymentMilestone = sequelize.define('PaymentMilestone', {
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    },
     milestone_id: {
         type: DataTypes.STRING(50),
-        primaryKey: true,
         allowNull: false,
+        unique: true,
     },
     project_id: {
         type: DataTypes.STRING(50),

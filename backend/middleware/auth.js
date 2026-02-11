@@ -4,11 +4,18 @@ const authMiddleware = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
-    if (token == null) return res.sendStatus(401);
+    if (token == null) {
+        console.log('Auth Middleware: No token provided');
+        return res.sendStatus(401);
+    }
 
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if (err) return res.sendStatus(403);
+        if (err) {
+            console.log('Auth Middleware: Token verification failed', err.message);
+            return res.sendStatus(403);
+        }
         req.user = user;
+        // console.log('Auth Middleware: User authenticated', user.id);
         next();
     });
 };

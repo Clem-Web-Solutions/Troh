@@ -1,4 +1,4 @@
-import { FileText, Download, FileSpreadsheet, FileImage, Loader2, Search, Filter } from 'lucide-react';
+import { FileText, Download, FileSpreadsheet, FileImage, Loader2, Search } from 'lucide-react';
 import { Card, CardContent, Button } from '../components/ui';
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
@@ -75,8 +75,8 @@ export function DocumentsPage() {
                                     key={cat}
                                     onClick={() => setFilterCategory(filterCategory === cat ? null : cat)}
                                     className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${filterCategory === cat
-                                            ? 'bg-red-50 border-red-200 text-red-700'
-                                            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                                        ? 'bg-red-50 border-red-200 text-red-700'
+                                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                                         }`}
                                 >
                                     {cat}
@@ -113,7 +113,7 @@ export function DocumentsPage() {
                             <div className="space-y-1">
                                 <p className="font-medium text-slate-600 truncate" title={doc.name}>{doc.name}</p>
                                 <div className="flex items-center justify-between text-xs text-slate-500">
-                                    <span>{new Date(doc.uploadDate).toLocaleDateString()}</span>
+                                    <span>{doc.uploaded_at ? new Date(doc.uploaded_at).toLocaleDateString() : 'Date inconnue'}</span>
                                     <span className="bg-slate-100 px-2 py-0.5 rounded-full">{doc.category}</span>
                                 </div>
                             </div>

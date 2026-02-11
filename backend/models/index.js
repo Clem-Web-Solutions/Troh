@@ -28,12 +28,12 @@ Project.hasMany(Phase, { foreignKey: 'project_id', as: 'phases' });
 Phase.belongsTo(Project, { foreignKey: 'project_id', as: 'project' });
 
 // Phase <-> PhaseTasks
-Phase.hasMany(PhaseTask, { foreignKey: 'phase_id', as: 'tasks' });
-PhaseTask.belongsTo(Phase, { foreignKey: 'phase_id', as: 'phase' });
+Phase.hasMany(PhaseTask, { foreignKey: 'phaseId', as: 'tasks' });
+PhaseTask.belongsTo(Phase, { foreignKey: 'phaseId', as: 'phase' });
 
 // Project <-> Documents
-Project.hasMany(Document, { foreignKey: 'project_id', as: 'documents' });
-Document.belongsTo(Project, { foreignKey: 'project_id', as: 'project' });
+Project.hasMany(Document, { foreignKey: 'projectId', as: 'documents' });
+Document.belongsTo(Project, { foreignKey: 'projectId', as: 'project' });
 
 // Project <-> Amendments
 Project.hasMany(Amendment, { foreignKey: 'project_id', as: 'amendments' });
@@ -63,9 +63,20 @@ PaymentMilestone.belongsTo(Project, { foreignKey: 'project_id', as: 'project' })
 Phase.hasMany(PaymentMilestone, { foreignKey: 'phase_id', as: 'milestones' });
 PaymentMilestone.belongsTo(Phase, { foreignKey: 'phase_id', as: 'phase' });
 
+// Project <-> Transactions
+Project.hasMany(Transaction, { foreignKey: 'projectId', as: 'transactions' });
+Transaction.belongsTo(Project, { foreignKey: 'projectId', as: 'project' });
+
 // Notifications
 User.hasMany(Notification, { foreignKey: 'user_id', as: 'notifications' });
 Notification.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
+
+// Activity Associations
+Activity.belongsTo(Project, { foreignKey: 'projectId', as: 'project' });
+Project.hasMany(Activity, { foreignKey: 'projectId', as: 'activities' });
+
+Activity.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+User.hasMany(Activity, { foreignKey: 'userId', as: 'activities' });
 
 // Legacy
 Folder.hasMany(Document, { foreignKey: 'folderId', as: 'documents' });

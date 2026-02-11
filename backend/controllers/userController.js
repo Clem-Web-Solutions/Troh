@@ -40,3 +40,30 @@ exports.deleteUser = async (req, res) => {
         res.status(500).json({ message: 'Erreur lors de la suppression' });
     }
 };
+
+exports.updateUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, email, phone, address, status, role } = req.body;
+
+        const user = await User.findByPk(id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Update fields if provided
+        if (name) user.name = name;
+        if (email) user.email = email;
+        if (phone) user.phone = phone;
+        if (address) user.address = address;
+        if (status) user.status = status;
+        if (role) user.role = role;
+
+        await user.save();
+
+        res.json({ success: true, message: 'User updated', user });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error updating user' });
+    }
+};

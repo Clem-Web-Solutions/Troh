@@ -11,7 +11,7 @@ const Transaction = sequelize.define('Transaction', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Projects',
+            model: 'projects',
             key: 'id',
         },
     },
@@ -35,6 +35,20 @@ const Transaction = sequelize.define('Transaction', {
         type: DataTypes.DATEONLY,
         defaultValue: DataTypes.NOW,
     },
+    dueDate: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+    },
+    milestoneId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: 'payment_milestones',
+            key: 'id' // Assuming auto-increment ID is safest for FK, though milestone_id string exists. Let's check PaymentMilestone model.
+            // PaymentMilestone has 'id' (INT PK) and 'milestone_id' (STRING unique).
+            // Using INT id is better for FKs usually.
+        }
+    }
 });
 
 module.exports = Transaction;

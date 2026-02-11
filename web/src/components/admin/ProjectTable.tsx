@@ -9,7 +9,7 @@ interface Project {
     progress: number;
     client?: { name: string };
     phases?: any[];
-    updatedAt: string;
+    date_creation: string;
 }
 
 interface ProjectTableProps {
@@ -35,7 +35,7 @@ export function ProjectTable({ projects, onSelectProject, onDelete }: ProjectTab
                             <th className="px-6 py-4">Client</th>
                             <th className="px-6 py-4">Projet</th>
                             <th className="px-6 py-4">État</th>
-                            <th className="px-6 py-4">Dernière mise à jour</th>
+                            <th className="px-6 py-4">Date de création</th>
                             <th className="px-6 py-4 text-right">Actions</th>
                         </tr>
                     </thead>
@@ -49,14 +49,14 @@ export function ProjectTable({ projects, onSelectProject, onDelete }: ProjectTab
                                 <td className="px-6 py-4 font-medium text-slate-600">{project.client?.name || 'N/A'}</td>
                                 <td className="px-6 py-4 text-slate-600">{project.name}</td>
                                 <td className="px-6 py-4">
-                                    <Badge variant={project.status === 'Completed' ? 'success' : project.status === 'Chantier' ? 'default' : 'neutral'}>
+                                    <Badge variant={project.status === 'Completed' || project.status === 'Livré' ? 'success' : project.status === 'Chantier' ? 'default' : 'neutral'}>
                                         {project.status} ({project.progress}%)
                                     </Badge>
                                 </td>
                                 <td className="px-6 py-4 text-slate-500">
                                     <div className="flex items-center gap-1.5">
                                         <Calendar className="w-3.5 h-3.5" />
-                                        {formatDate(project.updatedAt)}
+                                        {formatDate(project.date_creation)}
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 text-right">
@@ -113,7 +113,7 @@ export function ProjectTable({ projects, onSelectProject, onDelete }: ProjectTab
                             </Badge>
                             <div className="flex items-center gap-1.5 text-xs text-slate-500">
                                 <Calendar className="w-3.5 h-3.5" />
-                                {formatDate(project.updatedAt)}
+                                {formatDate(project.date_creation)}
                             </div>
                         </div>
                     </div>

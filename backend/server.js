@@ -50,6 +50,11 @@ app.use('/uploads', express.static('uploads'));
 sequelize.sync({ alter: true }) // alter checks for current state and updates schema
     .then(() => {
         console.log('Database synchronized');
+
+        // Init Cron Jobs
+        const initPaymentAlerts = require('./cron/paymentAlerts');
+        initPaymentAlerts();
+
         app.listen(PORT, () => {
             console.log(`Server running on port ${PORT}`);
         });

@@ -5,6 +5,7 @@ const { authMiddleware, checkRole } = require('../middleware/auth');
 
 // Get all users (or filter by role) - Admin only
 router.get('/', authMiddleware, checkRole(['admin']), userController.getUsers);
+router.put('/:id', authMiddleware, checkRole(['admin']), userController.updateUser);
 router.delete('/:id', authMiddleware, checkRole(['admin']), userController.deleteUser);
 
 module.exports = router;

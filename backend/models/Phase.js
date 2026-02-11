@@ -2,43 +2,50 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const Phase = sequelize.define('Phase', {
-    phase_id: {
-        type: DataTypes.STRING(50),
+    id: {
+        type: DataTypes.INTEGER,
         primaryKey: true,
-        allowNull: false,
+        autoIncrement: true,
     },
-    project_id: {
-        type: DataTypes.STRING(50),
+    projectId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
         references: {
             model: 'projects',
-            key: 'project_id',
+            key: 'id',
         },
     },
-    etape: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
-    },
-    statut: {
-        type: DataTypes.ENUM('pending', 'active', 'completed', 'blocked'),
-        defaultValue: 'pending',
-    },
-    date_debut: {
-        type: DataTypes.DATEONLY,
-        allowNull: true,
-    },
-    date_fin: {
-        type: DataTypes.DATEONLY,
-        allowNull: true,
-    },
-    // Compat fields
     name: {
         type: DataTypes.STRING,
-        allowNull: true
+        allowNull: false,
     },
+    status: {
+        type: DataTypes.ENUM('pending', 'active', 'completed'),
+        defaultValue: 'pending',
+    },
+    category: {
+        type: DataTypes.STRING, // 'DESIGN' or 'CONSTRUCTION'
+        defaultValue: 'DESIGN'
+    },
+    startDate: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+    },
+    endDate: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+    },
+    comments: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },
+    order: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    }
 }, {
-    tableName: 'project_phases',
-    timestamps: false
+    tableName: 'Phases',
+    timestamps: true
 });
 
 module.exports = Phase;

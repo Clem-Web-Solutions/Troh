@@ -23,6 +23,11 @@ CREATE TABLE IF NOT EXISTS Projects (
     status ENUM('Etude', 'Chantier', 'Livré', 'Suspendu') DEFAULT 'Etude',
     progress INT DEFAULT 0,
     clientId INT NOT NULL,
+    budget DECIMAL(15, 2),
+    currency VARCHAR(10) DEFAULT 'XOF',
+    estimated_start_date DATE,
+    entité ENUM('RAW_DESIGN', 'MEEREO_PROJECT') DEFAULT 'RAW_DESIGN',
+    project_type_id VARCHAR(50),
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (clientId) REFERENCES Users(id) ON DELETE CASCADE
@@ -67,3 +72,25 @@ CREATE TABLE IF NOT EXISTS Finances (
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (projectId) REFERENCES Projects(id) ON DELETE CASCADE
 );
+
+-- Table Activities
+CREATE TABLE IF NOT EXISTS Activities (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    type VARCHAR(255) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    projectId INT,
+    userId INT,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (projectId) REFERENCES Projects(id) ON DELETE SET NULL,
+    FOREIGN KEY (userId) REFERENCES Users(id) ON DELETE SET NULL
+);
+
+-- Table Projects (Update with new fields if not exists)
+-- This is a reference schema. If you already have the table, use ALTER TABLE commands.
+/*
+ALTER TABLE Projects ADD COLUMN budget DECIMAL(15, 2);
+ALTER TABLE Projects ADD COLUMN currency VARCHAR(10) DEFAULT 'XOF';
+ALTER TABLE Projects ADD COLUMN estimated_start_date DATE;
+ALTER TABLE Projects ADD COLUMN entité ENUM('RAW_DESIGN', 'MEEREO_PROJECT') DEFAULT 'RAW_DESIGN';
+*/

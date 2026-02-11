@@ -2,16 +2,17 @@ const express = require('express');
 const router = express.Router();
 const projectController = require('../controllers/projectController');
 const financeController = require('../controllers/financeController');
-// Auth middleware should be applied in index.js or here
-// const { authenticate } = require('../middleware/auth'); 
-// Assuming auth is handled in main index.js or passed down.
+const { authMiddleware, checkRole } = require('../middleware/auth');
+
+router.use(authMiddleware);
 
 // Projects
 router.get('/', projectController.getAllProjects);
 router.post('/', projectController.createProject);
+router.post('/:id/create-construction', projectController.createConstructionProject); // New route
 router.get('/:id', projectController.getProjectById);
 // router.put('/:id', projectController.updateProject);
-// router.delete('/:id', projectController.deleteProject);
+router.delete('/:id', checkRole(['admin']), projectController.deleteProject);
 
 // Sub-resources
 router.post('/:id/approve-task', projectController.approveTask);
