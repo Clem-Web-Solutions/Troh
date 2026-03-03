@@ -1,23 +1,16 @@
-
 import { ProjectDocuments } from '../components/admin/ProjectDocuments';
 import { PhaseControl } from '../components/admin/PhaseControl';
 import { FinanceForm } from '../components/admin/FinanceForm';
 import { Button, Badge, ConfirmationModal } from '../components/ui';
 import { ArrowLeft, User, Building, Loader2, AlertTriangle, Plus } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
-// Assuming Components exist or I will create them inline or separate?
-// User asked to modify this file. I will use the previously created ReserveList.
-// I will create inline UI or use existing placeholders if I can't import easily.
-import { ReserveList } from '../components/ReserveList'; // Imported from my previous creation
+import { ReserveList } from '../components/ReserveList';
 
-
-interface AdminProjectDetailsPageProps {
-    projectId: string;
-    onBack: () => void;
-}
-
-export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetailsPageProps) {
+export function AdminProjectDetailsPage() {
+    const { id: projectId } = useParams<{ id: string }>();
+    const navigate = useNavigate();
     const [project, setProject] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'tasks' | 'documents' | 'finance' | 'reserves' | 'amendments'>('tasks');
@@ -27,7 +20,6 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
     const [reserves, setReserves] = useState<any[]>([]);
     const [amendments, setAmendments] = useState<any[]>([]);
     const [isConstructionModalOpen, setIsConstructionModalOpen] = useState(false);
-
 
     useEffect(() => {
         const fetchData = async () => {
@@ -40,29 +32,6 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
                 setProject(projectData);
 
                 if (financeData) {
-                    // Start: Extract reserves and amendments if available in financeData (Project include)
-                    // Note: getFinance returns { total_budget, milestones }. 
-                    // Wait, getFinance controller:
-                    /*
-                    const project = await Project.findByPk(id, {
-                        include: [
-                            { model: Amendment, as: 'amendments' },
-                            { model: Reserve, as: 'reserves' },
-                            ...
-                        ]
-                    });
-                    ...
-                    res.json({
-                        total_budget: currentTotal,
-                        milestones: enrichedMilestones,
-                        // It DOES NOT return amendments/reserves directly in the JSON response currently!
-                        // I need to update financeController to return them OR create the routes.
-                        // Updating financeController is cleaner.
-                        amendments: project.amendments,
-                        reserves: project.reserves
-                    });
-                    */
-                    // For now, I'll update the controller to return these lists so frontend can use them.
                     setReserves(financeData.reserves || []);
                     setAmendments(financeData.amendments || []);
                 }
@@ -73,10 +42,10 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
                 setIsLoading(false);
             }
         };
-        fetchData();
+        if (projectId) {
+            fetchData();
+        }
     }, [projectId, projectRefreshKey]);
-
-
 
     if (isLoading) return <div className="flex justify-center p-20"><Loader2 className="animate-spin" /></div>;
     if (!project) return <div>Projet non trouvé</div>;
@@ -97,7 +66,7 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
 
             {/* Header */}
             <div className="flex flex-col gap-3 sm:gap-4 shrink-0">
-                <Button variant="ghost" className="w-fit -ml-2 text-slate-500 hover:text-slate-600 text-sm" onClick={onBack}>
+                <Button variant="ghost" className="w-fit -ml-2 text-slate-500 hover:text-slate-600 text-sm" onClick={() => navigate('/admin/projects')}>
                     <ArrowLeft className="w-4 h-4 mr-2" /> Retour aux projets
                 </Button>
 
@@ -124,7 +93,6 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
 
                                     const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-                                    // Determine Badge Variant based on valid options: default, success, warning, neutral
                                     let badgeVariant: "default" | "success" | "warning" | "neutral" = "neutral";
                                     let statusText = "Démarrage";
 
@@ -197,32 +165,24 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
             <div className="flex-1 min-h-0 bg-slate-50/50 rounded-xl p-1">
                 {activeTab === 'tasks' && (
                     <div className="h-full max-w-4xl mx-auto space-y-8 pb-10">
-/* Map Architecture */
+                        {/* Map Architecture */}
                         <PhaseControl
-                            projectId={projectId}
+                            projectId={projectId!}
                             title="Phase 1 : Études & Conception (Architecte)"
                             category="DESIGN"
                             onUpdate={() => setProjectRefreshKey(k => k + 1)}
                         />
 
                         {/* Map Construction (Conditional) */}
-                        {/* We check if project has construction context or simply show the control which will be empty/hidden if no phases? 
-                            Better to show the "Activate" block if no construction phases exist. 
-                            We can't easily check phases count here without fetching them. 
-                            However, PhaseControl fetches them. 
-                            Let's rely on a callback or simple check. 
-                            Actually, we can check project.entité or statut_global.
-                         */}
                         {project.entité === 'MEEREO_PROJECT' || project.statut_global === 'Chantier' ? (
                             <PhaseControl
-                                projectId={projectId}
+                                projectId={projectId!}
                                 title="Phase 2 : Travaux & Réalisation (Construction)"
                                 className="border-l-4 border-l-green-500"
                                 category="CONSTRUCTION"
                                 onUpdate={() => setProjectRefreshKey(k => k + 1)}
                             />
                         ) : (
-                            // ... inside return ...
                             project.entité === 'RAW_DESIGN' && (
                                 <div className="bg-white p-8 rounded-xl border border-dashed border-slate-300 text-center animate-in fade-in">
                                     <AlertTriangle className="w-10 h-10 text-amber-500 mx-auto mb-3" />
@@ -243,11 +203,10 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
                                         onClose={() => setIsConstructionModalOpen(false)}
                                         onConfirm={async () => {
                                             try {
-                                                await api.createConstructionProject(projectId);
+                                                await api.createConstructionProject(projectId!);
                                                 window.location.reload();
                                             } catch (e: any) {
                                                 console.error(e);
-                                                // Alert removed, maybe use toast? For now console.
                                             }
                                         }}
                                         title="Lancer la phase travaux ?"
@@ -264,7 +223,7 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
                 {activeTab === 'documents' && (
                     <div className="h-full max-w-5xl mx-auto">
                         <ProjectDocuments
-                            projectId={projectId}
+                            projectId={projectId!}
                             refreshKey={documentsRefreshKey}
                         />
                     </div>
@@ -272,7 +231,7 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
 
                 {activeTab === 'finance' && (
                     <div className="h-full max-w-3xl mx-auto">
-                        <FinanceForm projectId={parseInt(projectId)} />
+                        <FinanceForm projectId={parseInt(projectId!)} />
                     </div>
                 )}
 
@@ -282,7 +241,6 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
                             reserves={reserves}
                             onResolve={async (id) => {
                                 await fetch(`/api/reserves/${id}/resolve`, { method: 'PUT' });
-                                // Refresh
                                 const res = await fetch(`/api/projects/${projectId}/reserves`);
                                 setReserves(await res.json());
                             }}
@@ -293,7 +251,6 @@ export function AdminProjectDetailsPage({ projectId, onBack }: AdminProjectDetai
                 {activeTab === 'amendments' && (
                     <div className="h-full max-w-4xl mx-auto p-4">
                         <h2 className="text-xl font-bold mb-4">Avenants</h2>
-                        {/* Inline Amendment List/Form or Component */}
                         <div className="mb-4">
                             <Button onClick={() => { /* Open Modal */ }}>
                                 <Plus className="w-4 h-4 mr-2" /> Créer un avenant

@@ -4,6 +4,7 @@ import { DocumentGrid } from '../components/client/DocumentGrid';
 import { SiteGallery } from '../components/client/SiteGallery';
 import { ClientNotifications } from '../components/client/ClientNotifications';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 import { Loader2, LayoutDashboard, CalendarDays, FolderOpen, Image as ImageIcon, Menu, LogOut, ArrowRight, Wallet, Hammer } from 'lucide-react';
 import { cn, Button, Card, CardHeader, CardTitle, CardContent } from '../components/ui';
@@ -11,11 +12,8 @@ import { useProjectContext } from '../contexts/ProjectContext';
 
 type View = 'overview' | 'planning' | 'finance' | 'documents' | 'photos';
 
-interface ClientDashboardProps {
-    onLogout?: () => void;
-}
-
-export function ClientDashboard({ onLogout }: ClientDashboardProps) {
+export function ClientDashboard() {
+    const navigate = useNavigate();
     const { project } = useProjectContext();
     const [finance, setFinance] = useState<any>(null);
     const [phases, setPhases] = useState<any[]>([]);
@@ -42,15 +40,13 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                 const projects = await api.getProjects();
                 if (projects && projects.length > 0) {
                     const mainProject = projects[0];
-                    setProject(mainProject);
-                }
                     const [financeData, phasesData] = await Promise.all([
                         api.getFinance(mainProject.id).catch(() => null),
                         api.getPhases(mainProject.id).catch(() => [])
                     ]);
-                    
+
                     console.log('📊 Phases récupérées:', phasesData);
-                    
+
                     // Parse subtasks if they come as JSON strings
                     const parsedPhases = phasesData.map((phase: any) => {
                         if (phase.subtasks && typeof phase.subtasks === 'string') {
@@ -64,7 +60,7 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                         console.log(`Phase "${phase.name}":`, phase.subtasks);
                         return phase;
                     });
-                    
+
                     // Sort phases by Order, then Date, then ID
                     const sortedPhases = parsedPhases.sort((a: any, b: any) => {
                         const orderA = a.order || 0;
@@ -100,8 +96,6 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
     );
 
     // Derived Data
-    // Derived Data
-    // Normalize status check (DB is lowercase 'pending', App uses 'Pending')
     const currentPhaseIndex = phases.findIndex((p: any) => p.status.toLowerCase() === 'pending');
     const displayPhaseIndex = currentPhaseIndex === -1 ? phases.length - 1 : currentPhaseIndex;
     const currentPhase = phases[displayPhaseIndex] || { name: 'En attente' };
@@ -238,7 +232,6 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
         }
     };
 
-
     const ACTIVE_COLORS = [
         '#F80000', // Red
         '#B74CFF', // Purple
@@ -287,7 +280,11 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                 {/* Logout Button */}
                 <div className="p-4 sm:p-6 border-t border-slate-100">
                     <button
-                        onClick={onLogout}
+                        onClick={() => {
+                            localStorage.removeItem('token');
+                            localStorage.removeItem('user');
+                            navigate('/login');
+                        }}
                         className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors text-sm font-medium"
                     >
                         <LogOut className="w-4 h-4" />
@@ -314,8 +311,6 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                 <div className="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-8">
                     <div className="max-w-6xl mx-auto h-full">
                         {renderContent()}
-
-
                     </div>
                 </div>
             </main>

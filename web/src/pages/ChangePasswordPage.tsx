@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 import { Button, Card, CardHeader, CardTitle, CardContent } from '../components/ui';
 import { Lock, AlertCircle } from 'lucide-react';
 
 export function ChangePasswordPage() {
+    const navigate = useNavigate();
     const [password, setPassword] = useState('');
     const [confirm, setConfirm] = useState('');
     const [error, setError] = useState('');
@@ -15,7 +17,7 @@ export function ChangePasswordPage() {
 
         const storedUser = localStorage.getItem('user');
         if (!storedUser) {
-            window.location.href = '/';
+            navigate('/login');
             return;
         }
         const user = JSON.parse(storedUser);
@@ -36,12 +38,7 @@ export function ChangePasswordPage() {
 
             await api.changePassword(user.id, password);
 
-            // We need to update the local user state to reflect mustChangePassword = false
-            // Since useAuth likely just reads from state provided by App, and App might not have a dedicated "updateUser" exposed (I need to check App.tsx)
-            // For now, we can force a "re-login" effect or just manually redirect. 
-            // Better: update the stored user in localStorage and force reload or assume the next nav check works.
-
-            // Hacky fix for local state update without full auth context refactor:
+            // Update the stored user to reflect mustChangePassword = false
             const savedUser = localStorage.getItem('user');
             if (savedUser) {
                 const parsed = JSON.parse(savedUser);
@@ -49,11 +46,12 @@ export function ChangePasswordPage() {
                 localStorage.setItem('user', JSON.stringify(parsed));
             }
 
-            // If checking user from App.tsx state, we might need to reload or expose a setUser.
-            // Let's assume a hard reload for safety or navigating to dashboard might work if we bypassed the check?
-            // Actually, if App.tsx checks `user.mustChangePassword` on every render/route, we need to update `user` object in App state.
-
-            window.location.href = '/';
+            // Redirect to dashboard
+            if (user.role === 'admin') {
+                navigate('/admin/dashboard');
+            } else {
+                navigate('/client/dashboard');
+            }
 
         } catch (err) {
             console.error(err);
@@ -91,7 +89,7 @@ export function ChangePasswordPage() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none"
-                                placeholder="••••••••"
+                                placeholder="•••••••"
                             />
                         </div>
                         <div className="space-y-2">
@@ -102,7 +100,7 @@ export function ChangePasswordPage() {
                                 value={confirm}
                                 onChange={(e) => setConfirm(e.target.value)}
                                 className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-900 focus:outline-none"
-                                placeholder="••••••••"
+                                placeholder="•••••••"
                             />
                         </div>
 

@@ -1,10 +1,9 @@
 import { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, FolderOpen, Euro, Image, Settings, LogOut, ChevronLeft, Users, Briefcase } from 'lucide-react';
 import { cn } from '../ui';
 
 interface SidebarProps {
-    currentPath: string;
-    onNavigate: (path: string) => void;
     isMobileOpen: boolean;
     setIsMobileOpen: (open: boolean) => void;
     role: 'client' | 'admin';
@@ -12,17 +11,17 @@ interface SidebarProps {
 }
 
 const CLIENT_MENU = [
-    { icon: LayoutDashboard, label: 'Tableau de bord', path: 'dashboard' },
-    { icon: FolderOpen, label: 'Documents', path: 'documents' },
-    { icon: Euro, label: 'Suivi Financier', path: 'finance' },
-    { icon: Image, label: 'Galerie Chantier', path: 'gallery' },
+    { icon: LayoutDashboard, label: 'Tableau de bord', path: '/client/dashboard' },
+    { icon: FolderOpen, label: 'Documents', path: '/client/documents' },
+    { icon: Euro, label: 'Suivi Financier', path: '/client/finance' },
+    { icon: Image, label: 'Galerie Chantier', path: '/client/photos' },
 ];
 
 const ADMIN_MENU = [
-    { icon: LayoutDashboard, label: 'Tableau de bord', path: 'admin-dashboard' },
-    { icon: Briefcase, label: 'Clients', path: 'admin-clients' },
-    { icon: Users, label: 'Projets', path: 'admin-projects' },
-    { icon: Settings, label: 'Paramètres', path: 'settings' },
+    { icon: LayoutDashboard, label: 'Tableau de bord', path: '/admin/dashboard' },
+    { icon: Briefcase, label: 'Clients', path: '/admin/clients' },
+    { icon: Users, label: 'Projets', path: '/admin/projects' },
+    { icon: Settings, label: 'Paramètres', path: '/admin/settings' },
 ];
 
 const ACTIVE_COLORS = [
@@ -33,8 +32,9 @@ const ACTIVE_COLORS = [
     '#FF9C38'  // Orange
 ];
 
-export function Sidebar({ currentPath, onNavigate, isMobileOpen, setIsMobileOpen, role, onLogout }: SidebarProps) {
+export function Sidebar({ isMobileOpen, setIsMobileOpen, role, onLogout }: SidebarProps) {
     const [collapsed, setCollapsed] = useState(false);
+    const location = useLocation();
     const menuItems = role === 'admin' ? ADMIN_MENU : CLIENT_MENU;
 
     return (
@@ -91,16 +91,14 @@ export function Sidebar({ currentPath, onNavigate, isMobileOpen, setIsMobileOpen
                 {/* Navigation */}
                 <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
                     {menuItems.map((item, index) => {
-                        const isActive = currentPath === item.path;
+                        const isActive = location.pathname === item.path;
                         const activeColor = ACTIVE_COLORS[index % ACTIVE_COLORS.length];
 
                         return (
-                            <button
+                            <Link
                                 key={item.path}
-                                onClick={() => {
-                                    onNavigate(item.path);
-                                    setIsMobileOpen(false);
-                                }}
+                                to={item.path}
+                                onClick={() => setIsMobileOpen(false)}
                                 className={cn(
                                     "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group",
                                     isActive
@@ -111,7 +109,7 @@ export function Sidebar({ currentPath, onNavigate, isMobileOpen, setIsMobileOpen
                             >
                                 <item.icon className={cn("w-5 h-5 shrink-0", isActive ? "text-white" : "text-slate-400 group-hover:text-slate-600")} />
                                 {!collapsed && <span className="font-medium whitespace-nowrap">{item.label}</span>}
-                            </button>
+                            </Link>
                         )
                     })}
                 </nav>

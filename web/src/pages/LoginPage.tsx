@@ -1,13 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, Button } from '../components/ui';
 import { Lock, Mail, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { api } from '../lib/api';
 
-interface LoginPageProps {
-    onLogin: (user: any, token: string) => void;
-}
-
-export function LoginPage({ onLogin }: LoginPageProps) {
+export function LoginPage() {
+    const navigate = useNavigate();
     const [view, setView] = useState<'login' | 'forgot-email' | 'forgot-reset'>('login');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -26,7 +24,17 @@ export function LoginPage({ onLogin }: LoginPageProps) {
 
         try {
             const data = await api.login({ email, password });
-            onLogin(data.user, data.token);
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+
+            // Redirect based on role
+            if (data.user.mustChangePassword) {
+                navigate('/change-password');
+            } else if (data.user.role === 'admin') {
+                navigate('/admin/dashboard');
+            } else {
+                navigate('/client/dashboard');
+            }
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -145,7 +153,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                                             type="password"
                                             required
                                             className="w-full pl-9 px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none transition-all"
-                                            placeholder="••••••••"
+                                            placeholder="•••••••"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                         />
@@ -246,7 +254,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                                                 type="password"
                                                 required
                                                 className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none transition-all"
-                                                placeholder="••••••••"
+                                                placeholder="•••••••"
                                                 value={newPassword}
                                                 onChange={(e) => setNewPassword(e.target.value)}
                                             />
@@ -267,7 +275,7 @@ export function LoginPage({ onLogin }: LoginPageProps) {
                                                 type="password"
                                                 required
                                                 className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none transition-all"
-                                                placeholder="••••••••"
+                                                placeholder="•••••••"
                                                 value={confirmPassword}
                                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                             />
