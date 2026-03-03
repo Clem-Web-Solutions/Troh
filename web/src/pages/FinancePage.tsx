@@ -3,10 +3,8 @@ import { Card, CardHeader, CardTitle } from '../components/ui';
 import { Loader2, FileText } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
-import { useProjectContext } from '../contexts/ProjectContext';
 
 export function FinancePage() {
-    const { project } = useProjectContext();
     const [projects, setProjects] = useState<any[]>([]);
     const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
     const [finance, setFinance] = useState<any>(null);
