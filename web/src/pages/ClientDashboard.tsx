@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import { Loader2, LayoutDashboard, CalendarDays, FolderOpen, Image as ImageIcon, Menu, LogOut, ArrowRight, Wallet, Hammer } from 'lucide-react';
 import { cn, Button, Card, CardHeader, CardTitle, CardContent } from '../components/ui';
+import { useProjectContext } from '../contexts/ProjectContext';
 
 type View = 'overview' | 'planning' | 'finance' | 'documents' | 'photos';
 
@@ -15,7 +16,7 @@ interface ClientDashboardProps {
 }
 
 export function ClientDashboard({ onLogout }: ClientDashboardProps) {
-    const [project, setProject] = useState<any>(null);
+    const { project } = useProjectContext();
     const [finance, setFinance] = useState<any>(null);
     const [phases, setPhases] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -42,6 +43,7 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                 if (projects && projects.length > 0) {
                     const mainProject = projects[0];
                     setProject(mainProject);
+                }
                     const [financeData, phasesData] = await Promise.all([
                         api.getFinance(mainProject.id).catch(() => null),
                         api.getPhases(mainProject.id).catch(() => [])
@@ -175,7 +177,7 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                                         <div className="min-w-0 flex-1">
                                             <p className="text-xs sm:text-sm font-medium text-slate-500 mb-1">Budget Consommé</p>
                                             <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-600 truncate">
-                                                {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(finance?.paidAmount || 0)}
+                                                {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: project.currency || 'XOF' }).format(finance?.paidAmount || 0)}
                                             </h3>
                                         </div>
                                         <div className="p-2 bg-slate-50 rounded-lg group-hover:bg-red-50 transition-colors">
@@ -183,7 +185,7 @@ export function ClientDashboard({ onLogout }: ClientDashboardProps) {
                                         </div>
                                     </div>
                                     <div className="mt-3 sm:mt-4 text-xs text-slate-400 truncate">
-                                        Sur un total de {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(finance?.totalAmount || 0)}
+                                        Sur un total de {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: project.currency || 'XOF' }).format(finance?.totalAmount || 0)}
                                     </div>
                                 </CardContent>
                             </Card>

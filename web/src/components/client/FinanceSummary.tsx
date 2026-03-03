@@ -1,10 +1,12 @@
 import { Euro, TrendingUp } from 'lucide-react';
-import { Card, CardContent } from '../ui';
+import { Card, CardContent } from '../components/ui';
+import { formatCurrency } from '../contexts/ProjectContext';
 
 interface FinanceSummaryProps {
     totalBudget: number;
     paidAmount: number;
     totalLabel?: string;
+    currency?: string;
 }
 
 export function FinanceSummary({ totalBudget, paidAmount, totalLabel = "Budget Total" }: FinanceSummaryProps) {
@@ -36,11 +38,11 @@ export function FinanceSummary({ totalBudget, paidAmount, totalLabel = "Budget T
                 <div className="grid grid-cols-2 gap-4 mb-6">
                     <div>
                         <p className="text-sm text-slate-400 mb-1">{totalLabel}</p>
-                        <p className="text-2xl font-bold tracking-tight">{totalBudget.toLocaleString('fr-FR')} €</p>
+                        <p className="text-2xl font-bold tracking-tight">{formatCurrency(totalBudget, currency)}</p>
                     </div>
                     <div>
                         <p className="text-sm text-slate-400 mb-1">Reste à payer</p>
-                        <p className="text-2xl font-bold tracking-tight text-white">{remaining.toLocaleString('fr-FR')} €</p>
+                        <p className="text-2xl font-bold tracking-tight text-white">{formatCurrency(remaining, currency)}</p>
                     </div>
                 </div>
 
@@ -56,7 +58,7 @@ export function FinanceSummary({ totalBudget, paidAmount, totalLabel = "Budget T
                         />
                     </div>
                     <div className="flex justify-between text-xs text-slate-500 pt-1">
-                        <span>Versé: {paidAmount.toLocaleString('fr-FR')} €</span>
+                        <span>Versé: {formatCurrency(paidAmount, currency)}</span>
                     </div>
                 </div>
             </CardContent>

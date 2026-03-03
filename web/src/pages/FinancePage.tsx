@@ -3,8 +3,10 @@ import { Card, CardHeader, CardTitle } from '../components/ui';
 import { Loader2, FileText } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { api } from '../lib/api';
+import { useProjectContext } from '../contexts/ProjectContext';
 
 export function FinancePage() {
+    const { project } = useProjectContext();
     const [projects, setProjects] = useState<any[]>([]);
     const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
     const [finance, setFinance] = useState<any>(null);
@@ -110,6 +112,7 @@ export function FinancePage() {
                         totalBudget={displayTotal}
                         paidAmount={paidAmount}
                         totalLabel={displayLabel}
+                        currency={project?.currency || 'XOF'}
                     />
 
                     {/* Milestones / Tranches (Ultimate Prompt) */}
@@ -135,7 +138,7 @@ export function FinancePage() {
                                     {finance?.milestones?.map((m: any) => (
                                         <tr key={m.milestone_id} className="hover:bg-slate-50">
                                             <td className="p-4 font-medium text-slate-700">{m.label}</td>
-                                            <td className="p-4 text-slate-600">{((project.budget || 50000) * m.percentage / 100).toLocaleString()} €</td>
+                                            <td className="p-4 text-slate-600">{((project.budget || 50000) * m.percentage / 100).toLocaleString()} {project.currency}</td>
                                             <td className="p-4">
                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
                                                     ${m.status === 'paid' ? 'bg-green-100 text-green-800' :

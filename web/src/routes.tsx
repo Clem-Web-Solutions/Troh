@@ -6,6 +6,7 @@ import { DocumentsPage } from './pages/DocumentsPage';
 import { FinancePage } from './pages/FinancePage';
 import { GalleryPage } from './pages/GalleryPage';
 import { ChangePasswordPage } from './pages/ChangePasswordPage';
+import { ProjectContextProvider } from './contexts/ProjectContext';
 
 // Admin Pages
 import { AdminDashboard } from './pages/AdminDashboard';
@@ -26,7 +27,11 @@ export function AppRoutes({ currentPath, selectedProjectId, onNavigate, onNaviga
     switch (currentPath) {
         // Client Routes
         case 'dashboard':
-            return <ClientDashboard onLogout={onLogout} />;
+            return (
+                <ProjectContextProvider>
+                    <ClientDashboard onLogout={onLogout} />
+                </ProjectContextProvider>
+            );
         case 'documents':
             return <DocumentsPage />;
         case 'finance':
