@@ -8,7 +8,9 @@
       "Bash(timeout:*)",
       "Bash(powershell:*)",
       "Bash(ping:*)",
-      "Bash(node scripts/seedAdmin.js:*)"
+      "Bash(node scripts/seedAdmin.js:*)",
+      "Bash(git add web/src/contexts/ web/src/components/client/FinanceSummary.tsx web/src/pages/ClientDashboard.tsx web/src/pages/FinancePage.tsx web/src/routes.tsx)",
+      "Bash(git commit:*)"
     ]
   }
 }
